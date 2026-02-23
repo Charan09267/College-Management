@@ -6,7 +6,9 @@ const Navbar = () => {
     <nav className="fixed top-0 w-full z-50 bg-black/60 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between text-white">
         {/* Logo */}
-        <div className="text-xl font-bold">UNIVERSITY NAME</div>
+        <div className="text-xl font-bold">
+          Narsimha Reddy Engineering College
+        </div>
 
         {/* Links */}
         <ul className="hidden md:flex gap-6 text-sm">
