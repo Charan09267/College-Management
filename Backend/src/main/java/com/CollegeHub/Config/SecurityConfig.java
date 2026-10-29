@@ -47,18 +47,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/teacher/**").hasAnyRole("TEACHER" ,"ADMIN")
                         .requestMatchers("/api/v1/students/**").hasAnyRole("STUDENT" , "ADMIN")
                         .anyRequest().authenticated())
-
-                //dealing with session management
                 .sessionManagement( session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
-                //disabling the logout feature...
                 .logout(AbstractHttpConfigurer::disable)
-
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-
-                // add custom exception handling....(PENDING)....
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(customAuthenticationEntryPoint));
 
 
@@ -92,7 +85,6 @@ public class SecurityConfig {
                 "Range"                 // Needed for video streaming
         ));
 
-        //  Headers browser can READ from response
         config.setExposedHeaders(List.of(
                 "Authorization",
                 "Content-Type",

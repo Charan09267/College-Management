@@ -1,14 +1,16 @@
 package com.CollegeHub.Repository;
 
 import com.CollegeHub.Entity.StudentInfo;
-import com.CollegeHub.Entity.Users;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-import javax.swing.text.html.Option;
 import java.util.Optional;
 
-public interface StudentInfoRepo extends JpaRepository<StudentInfo, Long> {
-    Optional<StudentInfo> findByUser_Id(Long id);
+public interface StudentInfoRepo
+        extends MongoRepository<StudentInfo, String> {
 
-    Optional<StudentInfo> findByUser(Users user);
+    Optional<StudentInfo> findByUserId(Long userId);
+
+    boolean existsByUserId(Long userId);
+
+    boolean existsByRollNumber(String rollNumber);
 }

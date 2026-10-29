@@ -9,4 +9,5 @@ public class StudentInfoResponse {
     private String name;
     private String rollNumber;
     private String branch;
+    private Integer year;
 }

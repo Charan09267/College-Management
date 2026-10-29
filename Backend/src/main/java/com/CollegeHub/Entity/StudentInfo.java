@@ -1,35 +1,49 @@
 package com.CollegeHub.Entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import jakarta.persistence.*;
-import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
-
-@Entity
-@Table(name = "student_info")
+@Document(collection = "student_profiles")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class StudentInfo {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", unique = true)
-    private Users user;
+    @Indexed(unique = true)
+    private Long userId;
 
     private String name;
 
-    @Column(unique = true)
+    @Indexed(unique = true)
     private String rollNumber;
 
-    private String branch;
-    private Integer year;
-    private LocalDateTime createdAt;
-}
+    private String profileImageUrl;
 
+    private String branch;
+
+    private String department;
+
+    private Integer year;
+
+    private String section;
+
+    private String batch;
+
+    private ProfileStatus profileStatus = ProfileStatus.ACTIVE;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+}
