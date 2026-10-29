@@ -1,4 +1,4 @@
-package com.CollegeHub.DTO;
+package com.CollegeHub.DTO.StudentDetailsDTO;
 
 import lombok.Getter;
 import lombok.Setter;

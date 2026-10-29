@@ -1,10 +1,9 @@
-package com.CollegeHub.Services.TeacherService;
+package com.CollegeHub.Services.TeacherService.interfaces;
 
 import com.CollegeHub.DTO.CourseCreationDTO.CourseCreationRequest;
 import com.CollegeHub.DTO.CourseCreationDTO.CourseCreationResponse;
 import com.CollegeHub.Entity.Course;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 

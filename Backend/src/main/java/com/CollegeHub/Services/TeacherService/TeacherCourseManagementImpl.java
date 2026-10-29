@@ -3,11 +3,11 @@ package com.CollegeHub.Services.TeacherService;
 import com.CollegeHub.DTO.CourseCreationDTO.CourseCreationRequest;
 import com.CollegeHub.DTO.CourseCreationDTO.CourseCreationResponse;
 import com.CollegeHub.Entity.Course;
-import com.CollegeHub.Entity.TeacherInfo;
 import com.CollegeHub.Entity.Users;
 import com.CollegeHub.Repository.CourseRepository;
 import com.CollegeHub.Repository.TeacherInfoRepo;
 import com.CollegeHub.Repository.UserRepository;
+import com.CollegeHub.Services.TeacherService.interfaces.TeacherCourseManagementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class TeacherCourseManagementImpl implements TeacherCourseManagementService{
+public class TeacherCourseManagementImpl implements TeacherCourseManagementService {
 
     private final TeacherInfoRepo teacherInfoRepo;
     private final CourseRepository courseRepository;

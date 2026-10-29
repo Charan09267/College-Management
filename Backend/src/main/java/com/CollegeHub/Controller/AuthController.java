@@ -38,14 +38,10 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
-        System.out.println("Inside the login() method...");
-
         try{
             authenticate(loginRequest.getEmail() , loginRequest.getPassword());
 
             final UserDetails userDetails = appUserDetailsService.loadUserByUsername(loginRequest.getEmail());
-            System.out.println("Details recieved are - email = "+userDetails.getUsername()+" password = "+loginRequest.getPassword());
-
 
             final String jwtToken = jwtUtil.generateToken(userDetails);
 

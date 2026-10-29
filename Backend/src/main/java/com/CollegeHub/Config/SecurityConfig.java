@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -40,7 +41,6 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
 
-                //authorization for http requests....
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers( "/login" ,"/api/v1/auth/me","/logout").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
@@ -117,5 +117,6 @@ public class SecurityConfig {
         daoauthenticationProvider.setPasswordEncoder(passwordEncoder());
         return new ProviderManager(daoauthenticationProvider);
     }
+
 
 }

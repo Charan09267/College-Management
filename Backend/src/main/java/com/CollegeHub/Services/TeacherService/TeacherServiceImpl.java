@@ -5,8 +5,8 @@ import com.CollegeHub.Entity.TeacherInfo;
 import com.CollegeHub.Entity.Users;
 import com.CollegeHub.Repository.TeacherInfoRepo;
 import com.CollegeHub.Repository.UserRepository;
+import com.CollegeHub.Services.TeacherService.interfaces.TeacherService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class TeacherServiceImpl implements TeacherService{
+public class TeacherServiceImpl implements TeacherService {
 
     private final TeacherInfoRepo teacherInfoRepo;
     private final UserRepository userRepository;

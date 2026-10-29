@@ -28,7 +28,7 @@ public class ClassRecording {
     private String branch;
 
     @JsonIgnore
-    private String videoPath; // relative path
+    private String videoPath;
 
     private Integer year;
 
@@ -39,6 +39,4 @@ public class ClassRecording {
 
     private Boolean isActive = true;
     private LocalDateTime createdAt = LocalDateTime.now();
-
-    // getters & setters
 }

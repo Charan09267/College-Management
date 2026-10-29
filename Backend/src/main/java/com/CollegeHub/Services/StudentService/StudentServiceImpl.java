@@ -1,7 +1,7 @@
 package com.CollegeHub.Services.StudentService;
 
 import com.CollegeHub.DTO.StudentDetailsDTO.StudentCourseRegistration;
-import com.CollegeHub.DTO.StudentDetailsRes;
+import com.CollegeHub.DTO.StudentDetailsDTO.StudentDetailsRes;
 import com.CollegeHub.Entity.Course;
 import com.CollegeHub.Entity.CourseLike;
 import com.CollegeHub.Entity.StudentInfo;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
