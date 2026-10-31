@@ -30,86 +30,86 @@ import java.util.ResourceBundle;
 @RequiredArgsConstructor
 public class StudentRecordingService {
 
-    private final ClassRecordingRepository recordingRepo;
-    private final StudentInfoRepo studentInfoRepo;
-
-    public List<ClassRecording> getRecordings(
-            Users user ,
-            LocalDate date,
-            String subject,
-            Integer period
-    ){
-        StudentInfo student = studentInfoRepo.findByUserId(user.getId()).orElseThrow(()->new RuntimeException("Student info not found...???"));
-
-        return recordingRepo.searchForStudent(
-                student.getYear(),
-                student.getBranch(),
-                date,
-                subject,
-                period
-        );
-    }
-
-    public ResponseEntity<Resource> streamVideoById(Long recordingId , Users user , String rangeHeader) throws IOException {
-
-        //1. fetch student info
-        StudentInfo student = studentInfoRepo.findByUserId(user.getId()).orElseThrow(()->new RuntimeException("Student Info not found"));
-
-        //2.fetch recording
-        ClassRecording recording = recordingRepo.findById(recordingId).orElseThrow(() -> new RuntimeException("Recording not found.."));
-
-        // 3. Authorization check
-        if (!recording.getYear().equals(student.getYear()) ||
-                !recording.getBranch().equals(student.getBranch())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
-        if (!Boolean.TRUE.equals(recording.getIsActive())) {
-            return ResponseEntity.status(HttpStatus.GONE).build();
-        }
-
-        // 4. Load file
-        Path videoPath = Paths.get(recording.getVideoPath());
-        if (!Files.exists(videoPath)) {
-            return ResponseEntity.notFound().build();
-        }
-
-        long fileSize = Files.size(videoPath);
-
-        long rangeStart = 0;
-        long rangeEnd = fileSize - 1;
-
-        //5. Parse Range header
-        if(rangeHeader != null && rangeHeader.startsWith("bytes=")){
-            String[] ranges = rangeHeader.replace("bytes=","").split("-");
-            rangeStart = Long.parseLong(ranges[0]);
-
-            if(ranges.length > 1 && !ranges[1].isEmpty()){
-                rangeEnd = Long.parseLong(ranges[1]);
-            }
-        }
-
-        if(rangeEnd >= fileSize){
-            rangeEnd = fileSize-1;
-        }
-
-        long contentLength = rangeEnd - rangeStart + 1;
-
-        //6. Create InputStreamResource for partial content
-        InputStream inputStream = Files.newInputStream(videoPath);
-        inputStream.skip(rangeStart);
-
-        Resource resource = new InputStreamResource(inputStream);
-
-        HttpHeaders headers = new HttpHeaders();
-
-        headers.add(HttpHeaders.CONTENT_RANGE ,
-                "bytes "+rangeStart+"-"+rangeEnd+"/"+fileSize);
-        headers.add(HttpHeaders.ACCEPT_RANGES , "bytes");
-        headers.setContentLength(contentLength);
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-
-        return new ResponseEntity<>(resource , headers , HttpStatus.PARTIAL_CONTENT);
-
-    }
+//    private final ClassRecordingRepository recordingRepo;
+//    private final StudentInfoRepo studentInfoRepo;
+//
+//    public List<ClassRecording> getRecordings(
+//            Users user ,
+//            LocalDate date,
+//            String subject,
+//            Integer period
+//    ){
+//        StudentInfo student = studentInfoRepo.findByUserId(user.getId()).orElseThrow(()->new RuntimeException("Student info not found...???"));
+//
+//        return recordingRepo.searchForStudent(
+//                student.getYear(),
+//                student.getBranch(),
+//                date,
+//                subject,
+//                period
+//        );
+//    }
+//
+//    public ResponseEntity<Resource> streamVideoById(Long recordingId , Users user , String rangeHeader) throws IOException {
+//
+//        //1. fetch student info
+//        StudentInfo student = studentInfoRepo.findByUserId(user.getId()).orElseThrow(()->new RuntimeException("Student Info not found"));
+//
+//        //2.fetch recording
+//        ClassRecording recording = recordingRepo.findById(recordingId).orElseThrow(() -> new RuntimeException("Recording not found.."));
+//
+//        // 3. Authorization check
+//        if (!recording.getYear().equals(student.getYear()) ||
+//                !recording.getBranch().equals(student.getBranch())) {
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+//        }
+//
+//        if (!Boolean.TRUE.equals(recording.getIsActive())) {
+//            return ResponseEntity.status(HttpStatus.GONE).build();
+//        }
+//
+//        // 4. Load file
+//        Path videoPath = Paths.get(recording.getVideoPath());
+//        if (!Files.exists(videoPath)) {
+//            return ResponseEntity.notFound().build();
+//        }
+//
+//        long fileSize = Files.size(videoPath);
+//
+//        long rangeStart = 0;
+//        long rangeEnd = fileSize - 1;
+//
+//        //5. Parse Range header
+//        if(rangeHeader != null && rangeHeader.startsWith("bytes=")){
+//            String[] ranges = rangeHeader.replace("bytes=","").split("-");
+//            rangeStart = Long.parseLong(ranges[0]);
+//
+//            if(ranges.length > 1 && !ranges[1].isEmpty()){
+//                rangeEnd = Long.parseLong(ranges[1]);
+//            }
+//        }
+//
+//        if(rangeEnd >= fileSize){
+//            rangeEnd = fileSize-1;
+//        }
+//
+//        long contentLength = rangeEnd - rangeStart + 1;
+//
+//        //6. Create InputStreamResource for partial content
+//        InputStream inputStream = Files.newInputStream(videoPath);
+//        inputStream.skip(rangeStart);
+//
+//        Resource resource = new InputStreamResource(inputStream);
+//
+//        HttpHeaders headers = new HttpHeaders();
+//
+//        headers.add(HttpHeaders.CONTENT_RANGE ,
+//                "bytes "+rangeStart+"-"+rangeEnd+"/"+fileSize);
+//        headers.add(HttpHeaders.ACCEPT_RANGES , "bytes");
+//        headers.setContentLength(contentLength);
+//        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+//
+//        return new ResponseEntity<>(resource , headers , HttpStatus.PARTIAL_CONTENT);
+//
+//    }
 }

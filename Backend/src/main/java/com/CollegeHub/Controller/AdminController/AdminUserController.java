@@ -40,7 +40,7 @@ public class AdminUserController {
     }
     @PostMapping("users/student")
     public ResponseEntity<StudentInfoResponse> addStudentInfo(@RequestBody StudentInfoRequest request){
-        System.out.println("Enterred the controller / student");
+        System.out.println("Entered the controller / student");
         return adminService.addStudentInfo(request);
     }
 
