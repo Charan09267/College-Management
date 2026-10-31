@@ -39,7 +39,7 @@ public class StudentRecordingService {
             String subject,
             Integer period
     ){
-        StudentInfo student = studentInfoRepo.findByUser(user).orElseThrow(()->new RuntimeException("Student info not found...???"));
+        StudentInfo student = studentInfoRepo.findByUserId(user.getId()).orElseThrow(()->new RuntimeException("Student info not found...???"));
 
         return recordingRepo.searchForStudent(
                 student.getYear(),
@@ -53,7 +53,7 @@ public class StudentRecordingService {
     public ResponseEntity<Resource> streamVideoById(Long recordingId , Users user , String rangeHeader) throws IOException {
 
         //1. fetch student info
-        StudentInfo student = studentInfoRepo.findByUser(user).orElseThrow(()->new RuntimeException("Student Info not found"));
+        StudentInfo student = studentInfoRepo.findByUserId(user.getId()).orElseThrow(()->new RuntimeException("Student Info not found"));
 
         //2.fetch recording
         ClassRecording recording = recordingRepo.findById(recordingId).orElseThrow(() -> new RuntimeException("Recording not found.."));

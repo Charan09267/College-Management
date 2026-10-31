@@ -32,30 +32,34 @@ public class StudentServiceImpl implements StudentService{
     @Override
     public ResponseEntity<StudentDetailsRes> getStudentDetails(String email) {
 
-        Optional<Users> user = userRepository.findByEmail(email);
-        if(!user.isPresent()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StudentDetailsRes());
+        Users user = userRepository.findByEmail(email)
+                .orElse(null);
 
-        Optional<StudentInfo> info = studentInfoRepo.findByUser_Id(user.get().getId());
-
-        if(!info.isPresent()){
-            System.out.println("Info in 39 th line is executing...");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new StudentDetailsRes());
         }
 
+        StudentInfo info = studentInfoRepo.findByUserId(user.getId())
+                .orElse(null);
+
+        if (info == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new StudentDetailsRes());
+        }
 
         StudentDetailsRes response = new StudentDetailsRes();
-        response.setBranch(info.get().getBranch());
-        response.setEmail(user.get().getEmail());
-        response.setRole(user.get().getRole());
-        response.setName(info.get().getName());
-        response.setRollNumber(info.get().getRollNumber());
-        response.setYear(String.valueOf(info.get().getYear()));
-        response.setUserId(user.get().getId());
 
+        response.setBranch(info.getBranch());
+        response.setEmail(user.getEmail());
+        response.setRole(user.getRole());
+        response.setName(info.getName());
+        response.setRollNumber(info.getRollNumber());
+        response.setYear(String.valueOf(info.getYear()));
+        response.setUserId(user.getId());
 
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
-
 
     @Override
     public ResponseEntity<?> enrollTheCourse(StudentCourseRegistration request) {
@@ -95,10 +99,11 @@ public class StudentServiceImpl implements StudentService{
 
     @Override
     public ResponseEntity<List<Course>> getEnrolledCourses(Authentication auth) {
-        String email = auth.getName();
-        Users student = userRepository.findByEmail(email).orElseThrow();
 
-        System.out.println("Email :-"+email+" student id :-"+ student.getId());
+        String email = auth.getName();
+
+        Users student = userRepository.findByEmail(email)
+                .orElseThrow();
 
         List<Course> courses = courseRegistration
                 .findByStudent_Id(student.getId())
@@ -107,6 +112,5 @@ public class StudentServiceImpl implements StudentService{
                 .toList();
 
         return ResponseEntity.ok(courses);
-
     }
 }
