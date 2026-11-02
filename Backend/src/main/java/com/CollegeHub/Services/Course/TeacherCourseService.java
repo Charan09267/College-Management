@@ -7,6 +7,7 @@ import com.CollegeHub.Entity.Course;
 import com.CollegeHub.Entity.Users;
 import com.CollegeHub.Repository.CourseRepository;
 import com.CollegeHub.Repository.UserRepository;
+import com.CollegeHub.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
