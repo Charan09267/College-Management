@@ -1,4 +1,4 @@
-package com.CollegeHub.recording.dto.ClassRecordings;
+package com.CollegeHub.recording.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

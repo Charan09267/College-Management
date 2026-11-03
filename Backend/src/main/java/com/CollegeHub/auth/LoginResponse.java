@@ -1,4 +1,4 @@
-package com.CollegeHub.DTO.LoginDTO;
+package com.CollegeHub.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

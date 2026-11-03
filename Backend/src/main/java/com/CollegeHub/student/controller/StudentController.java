@@ -2,6 +2,7 @@ package com.CollegeHub.student.controller;
 
 import com.CollegeHub.admin.entity.Users;
 import com.CollegeHub.admin.repository.UserRepository;
+import com.CollegeHub.recording.dto.RecordingDetailsResponse;
 import com.CollegeHub.recording.entity.ClassRecording;
 import com.CollegeHub.recording.service.ClassRecordingService;
 import com.CollegeHub.student.dto.StudentDetailsDTO.StudentDetailsRes;
@@ -39,7 +40,7 @@ public class StudentController {
 
     // Get recordings matching the logged-in student's academic year
     @GetMapping("/recordings")
-    public ResponseEntity<List<ClassRecording>> getStudentRecordings(
+    public ResponseEntity<List<RecordingDetailsResponse>> getStudentRecordings(
             Authentication authentication) {
 
         Long studentUserId = getStudentUserId(authentication);

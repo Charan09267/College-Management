@@ -1,6 +1,6 @@
 package com.CollegeHub.Filter;
 
-import com.CollegeHub.AppUserDetailsService;
+import com.CollegeHub.auth.AppUserDetailsService;
 import com.CollegeHub.Util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

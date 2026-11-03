@@ -1,8 +1,6 @@
-package com.CollegeHub;
+package com.CollegeHub.auth;
 
 
-import com.CollegeHub.DTO.LoginDTO.LoginRequest;
-import com.CollegeHub.DTO.LoginDTO.LoginResponse;
 import com.CollegeHub.Util.JwtUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;

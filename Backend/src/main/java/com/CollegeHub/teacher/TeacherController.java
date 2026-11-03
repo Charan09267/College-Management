@@ -2,6 +2,7 @@ package com.CollegeHub.teacher;
 
 import com.CollegeHub.admin.entity.Users;
 import com.CollegeHub.admin.repository.UserRepository;
+import com.CollegeHub.recording.dto.RecordingDetailsResponse;
 import com.CollegeHub.recording.entity.ClassRecording;
 import com.CollegeHub.recording.service.ClassRecordingService;
 import com.CollegeHub.teacher.dto.TeacherDetailsResponse;
@@ -43,7 +44,7 @@ public class TeacherController {
 
     // Upload a class recording
     @PostMapping(value = "/recordings", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ClassRecording> uploadRecording(
+    public ResponseEntity<RecordingDetailsResponse> uploadRecording(
             @RequestParam String title,
             @RequestParam(required = false) String description,
             @RequestParam String subject,
@@ -56,7 +57,7 @@ public class TeacherController {
 
         Long teacherUserId = getTeacherUserId(authentication);
 
-        ClassRecording recording = classRecordingService.uploadRecording(
+        RecordingDetailsResponse recording = classRecordingService.uploadRecording(
                 title,
                 description,
                 subject,
@@ -73,7 +74,7 @@ public class TeacherController {
 
     // Get recordings uploaded by the logged-in teacher
     @GetMapping("/recordings")
-    public ResponseEntity<List<ClassRecording>> getTeacherRecordings(
+    public ResponseEntity<List<RecordingDetailsResponse>> getTeacherRecordings(
             Authentication authentication) {
 
         Long teacherUserId = getTeacherUserId(authentication);

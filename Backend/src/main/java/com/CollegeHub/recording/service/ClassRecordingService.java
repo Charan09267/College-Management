@@ -1,5 +1,6 @@
 package com.CollegeHub.recording.service;
 
+import com.CollegeHub.recording.dto.RecordingDetailsResponse;
 import com.CollegeHub.recording.entity.ClassRecording;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
@@ -9,7 +10,7 @@ import java.util.List;
 
 public interface ClassRecordingService {
 
-    ClassRecording uploadRecording(
+    RecordingDetailsResponse  uploadRecording(
             String title,
             String description,
             String subject,
@@ -21,9 +22,9 @@ public interface ClassRecordingService {
             MultipartFile file
     ) throws IOException;
 
-    List<ClassRecording> getRecordingsForStudent(Long studentUserId);
+    List<RecordingDetailsResponse> getRecordingsForStudent(Long studentUserId);
 
-    List<ClassRecording> getRecordingsForTeacher(Long teacherUserId);
+    List<RecordingDetailsResponse> getRecordingsForTeacher(Long teacherUserId);
 
     Resource streamRecording(String recordingId, Long studentUserId);
 

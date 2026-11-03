@@ -2,6 +2,7 @@ package com.CollegeHub.recording.service;
 
 import com.CollegeHub.exception.ResourceAccessDeniedException;
 import com.CollegeHub.exception.ResourceNotFoundException;
+import com.CollegeHub.recording.dto.RecordingDetailsResponse;
 import com.CollegeHub.recording.entity.ClassRecording;
 import com.CollegeHub.recording.repository.ClassRecordingRepository;
 import com.CollegeHub.storage.VideoStorageService;
@@ -24,10 +25,11 @@ public class ClassRecordingServiceImpl implements ClassRecordingService {
     private final ClassRecordingRepository classRecordingRepository;
     private final StudentInfoRepo studentInfoRepo;
     private final VideoStorageService videoStorageService;
+    private final RecordingMapper recordingMapper;
 
     // Upload a video to S3 and save its metadata in MongoDB
     @Override
-    public ClassRecording uploadRecording(
+    public RecordingDetailsResponse  uploadRecording(
             String title,
             String description,
             String subject,
@@ -73,7 +75,9 @@ public class ClassRecordingServiceImpl implements ClassRecordingService {
                     .createdAt(LocalDateTime.now())
                     .build();
 
-            return classRecordingRepository.save(recording);
+            ClassRecording savedRecording = classRecordingRepository.save(recording);
+
+            return recordingMapper.toResponse(savedRecording);
 
         } catch (RuntimeException exception) {
 
@@ -90,22 +94,28 @@ public class ClassRecordingServiceImpl implements ClassRecordingService {
 
     // Retrieve recordings belonging to the student's academic year
     @Override
-    public List<ClassRecording> getRecordingsForStudent(Long studentUserId) {
-
+    public List<RecordingDetailsResponse> getRecordingsForStudent(
+            Long studentUserId
+    ) {
         StudentInfo student = studentInfoRepo.findByUserId(studentUserId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Student profile not found"));
 
-        return classRecordingRepository
-                .findByYearAndIsActiveTrue(student.getYear());
+        List<ClassRecording> recordings =
+                classRecordingRepository.findByYearAndIsActiveTrue(student.getYear());
+
+        return recordingMapper.toResponseList(recordings);
     }
 
     // Retrieve recordings uploaded by the logged-in teacher
     @Override
-    public List<ClassRecording> getRecordingsForTeacher(Long teacherUserId) {
+    public List<RecordingDetailsResponse> getRecordingsForTeacher(
+            Long teacherUserId
+    ) {
+        List<ClassRecording> recordings =
+                classRecordingRepository.findByUploadedByUserIdAndIsActiveTrue(teacherUserId);
 
-        return classRecordingRepository
-                .findByUploadedByUserIdAndIsActiveTrue(teacherUserId);
+        return recordingMapper.toResponseList(recordings);
     }
 
     // Stream a recording after validating the student's academic year
