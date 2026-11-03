@@ -1,8 +1,8 @@
 package com.CollegeHub;
 
-import com.CollegeHub.Entity.CourseLike;
-import com.CollegeHub.Repository.CourseRegistration;
-import com.CollegeHub.Repository.CourseRepository;
+import com.CollegeHub.course.entity.CourseLike;
+import com.CollegeHub.course.repository.CourseRegistration;
+import com.CollegeHub.course.repository.CourseRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
