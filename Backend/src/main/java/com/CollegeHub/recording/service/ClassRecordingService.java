@@ -1,10 +1,8 @@
 package com.CollegeHub.recording.service;
 
-
 import com.CollegeHub.recording.entity.ClassRecording;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
@@ -18,7 +16,7 @@ public interface ClassRecordingService {
             LocalDate classDate,
             Integer periodNumber,
             String branch,
-            String year,
+            Integer year,
             Long teacherUserId,
             MultipartFile file
     ) throws IOException;
@@ -29,8 +27,7 @@ public interface ClassRecordingService {
 
     Resource streamRecording(String recordingId, Long studentUserId);
 
-    void deleteRecording(String recordingId, Long teacherUserId) throws IOException;
-
     Resource streamTeacherRecording(String recordingId, Long teacherUserId);
 
+    void deleteRecording(String recordingId, Long teacherUserId) throws IOException;
 }

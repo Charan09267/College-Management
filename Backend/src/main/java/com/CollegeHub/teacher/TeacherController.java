@@ -50,7 +50,7 @@ public class TeacherController {
             @RequestParam LocalDate classDate,
             @RequestParam Integer periodNumber,
             @RequestParam String branch,
-            @RequestParam String year,
+            @RequestParam Integer year,
             @RequestPart("file") MultipartFile file,
             Authentication authentication) throws IOException {
 

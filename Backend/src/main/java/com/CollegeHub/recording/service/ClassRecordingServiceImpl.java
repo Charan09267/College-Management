@@ -1,30 +1,31 @@
 package com.CollegeHub.recording.service;
 
-
-
+import com.CollegeHub.exception.ResourceAccessDeniedException;
+import com.CollegeHub.exception.ResourceNotFoundException;
 import com.CollegeHub.recording.entity.ClassRecording;
 import com.CollegeHub.recording.repository.ClassRecordingRepository;
 import com.CollegeHub.storage.VideoStorageService;
 import com.CollegeHub.student.entity.StudentInfo;
 import com.CollegeHub.student.repository.StudentInfoRepo;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class ClassRecordingServiceImpl implements ClassRecordingService {
 
     private final ClassRecordingRepository classRecordingRepository;
-    private final StudentInfoRepo studentInfoRepository;
+    private final StudentInfoRepo studentInfoRepo;
     private final VideoStorageService videoStorageService;
 
+    // Upload a video to S3 and save its metadata in MongoDB
     @Override
     public ClassRecording uploadRecording(
             String title,
@@ -33,7 +34,7 @@ public class ClassRecordingServiceImpl implements ClassRecordingService {
             LocalDate classDate,
             Integer periodNumber,
             String branch,
-            String year,
+            Integer year,
             Long teacherUserId,
             MultipartFile file
     ) throws IOException {
@@ -42,32 +43,44 @@ public class ClassRecordingServiceImpl implements ClassRecordingService {
             throw new IllegalArgumentException("Video file cannot be empty");
         }
 
-        // Store the actual video in AWS S3
+        if (title == null || title.isBlank()
+                || subject == null || subject.isBlank()
+                || branch == null || branch.isBlank()
+                || year == null
+                || teacherUserId == null) {
+            throw new IllegalArgumentException("Required recording details are missing");
+        }
+
+        // Upload the actual video to AWS S3
         String videoPath = videoStorageService.storeVideo(file);
 
         try {
             // Create recording metadata
-            ClassRecording recording = new ClassRecording();
-
-            recording.setTitle(title);
-            recording.setDescription(description);
-            recording.setSubject(subject);
-            recording.setClassDate(classDate);
-            recording.setPeriodNumber(periodNumber);
-            recording.setBranch(branch);
-            recording.setYear(Integer.parseInt(year));
-            recording.setUploadedByUserId(teacherUserId);
-            recording.setVideoPath(videoPath);
-            recording.setIsActive(true);
+            ClassRecording recording = ClassRecording.builder()
+                    .title(title)
+                    .description(description)
+                    .subject(subject)
+                    .classDate(classDate)
+                    .periodNumber(periodNumber)
+                    .branch(branch)
+                    .year(year)
+                    .uploadedByUserId(teacherUserId)
+                    .videoPath(videoPath)
+                    .originalFileName(file.getOriginalFilename())
+                    .contentType(file.getContentType())
+                    .fileSize(file.getSize())
+                    .isActive(true)
+                    .createdAt(LocalDateTime.now())
+                    .build();
 
             return classRecordingRepository.save(recording);
 
         } catch (RuntimeException exception) {
 
-            // Clean up the uploaded S3 object if MongoDB save fails
+            // Remove the S3 object if saving metadata in MongoDB fails
             try {
                 videoStorageService.deleteVideo(videoPath);
-            } catch (IOException cleanupException) {
+            } catch (IOException | RuntimeException cleanupException) {
                 exception.addSuppressed(cleanupException);
             }
 
@@ -75,18 +88,19 @@ public class ClassRecordingServiceImpl implements ClassRecordingService {
         }
     }
 
+    // Retrieve recordings belonging to the student's academic year
     @Override
     public List<ClassRecording> getRecordingsForStudent(Long studentUserId) {
 
-        StudentInfo student = studentInfoRepository.findByUserId(studentUserId)
+        StudentInfo student = studentInfoRepo.findByUserId(studentUserId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Student profile not found"));
+                        new ResourceNotFoundException("Student profile not found"));
 
-        // Students can only see recordings belonging to their academic year
         return classRecordingRepository
                 .findByYearAndIsActiveTrue(student.getYear());
     }
 
+    // Retrieve recordings uploaded by the logged-in teacher
     @Override
     public List<ClassRecording> getRecordingsForTeacher(Long teacherUserId) {
 
@@ -94,47 +108,29 @@ public class ClassRecordingServiceImpl implements ClassRecordingService {
                 .findByUploadedByUserIdAndIsActiveTrue(teacherUserId);
     }
 
+    // Stream a recording after validating the student's academic year
     @Override
     public Resource streamRecording(String recordingId, Long studentUserId) {
 
-        StudentInfo student = studentInfoRepository.findByUserId(studentUserId)
+        StudentInfo student = studentInfoRepo.findByUserId(studentUserId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Student profile not found"));
+                        new ResourceNotFoundException("Student profile not found"));
 
         ClassRecording recording = classRecordingRepository
                 .findByIdAndIsActiveTrue(recordingId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Recording not found"));
+                        new ResourceNotFoundException("Recording not found"));
 
-        // Prevent students from accessing recordings from other years
-        if (!recording.getYear().equals(student.getYear())) {
-            throw new IllegalArgumentException(
+        // Students can only access recordings belonging to their year
+        if (!Objects.equals(recording.getYear(), student.getYear())) {
+            throw new ResourceAccessDeniedException(
                     "You are not authorized to access this recording");
         }
 
         return videoStorageService.loadVideo(recording.getVideoPath());
     }
 
-    @Override
-    public void deleteRecording(String recordingId, Long teacherUserId)
-            throws IOException {
-
-        ClassRecording recording = classRecordingRepository
-                .findByIdAndIsActiveTrue(recordingId)
-                .orElseThrow(() ->
-                        new IllegalArgumentException("Recording not found"));
-
-        // Only the teacher who uploaded the recording can delete it
-        if (!recording.getUploadedByUserId().equals(teacherUserId)) {
-            throw new IllegalArgumentException(
-                    "You are not authorized to delete this recording");
-        }
-
-        videoStorageService.deleteVideo(recording.getVideoPath());
-
-        classRecordingRepository.delete(recording);
-    }
-
+    // Stream a recording only if it belongs to the logged-in teacher
     @Override
     public Resource streamTeacherRecording(
             String recordingId,
@@ -143,13 +139,39 @@ public class ClassRecordingServiceImpl implements ClassRecordingService {
         ClassRecording recording = classRecordingRepository
                 .findByIdAndIsActiveTrue(recordingId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Recording not found"));
+                        new ResourceNotFoundException("Recording not found"));
 
-        if (!recording.getUploadedByUserId().equals(teacherUserId)) {
-            throw new IllegalArgumentException(
+        if (!Objects.equals(recording.getUploadedByUserId(), teacherUserId)) {
+            throw new ResourceAccessDeniedException(
                     "You are not authorized to access this recording");
         }
 
         return videoStorageService.loadVideo(recording.getVideoPath());
+    }
+
+    // Deactivate the recording and remove its video from S3
+    @Override
+    public void deleteRecording(
+            String recordingId,
+            Long teacherUserId
+    ) throws IOException {
+
+        ClassRecording recording = classRecordingRepository
+                .findByIdAndIsActiveTrue(recordingId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Recording not found"));
+
+        // Only the uploading teacher can delete the recording
+        if (!Objects.equals(recording.getUploadedByUserId(), teacherUserId)) {
+            throw new ResourceAccessDeniedException(
+                    "You are not authorized to delete this recording");
+        }
+
+        // Deactivate first so the recording is no longer accessible
+        recording.setIsActive(false);
+        classRecordingRepository.save(recording);
+
+        // Delete the actual video from S3
+        videoStorageService.deleteVideo(recording.getVideoPath());
     }
 }
