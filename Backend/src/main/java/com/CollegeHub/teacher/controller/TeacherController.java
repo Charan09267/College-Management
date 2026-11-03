@@ -1,13 +1,14 @@
-package com.CollegeHub.teacher;
+package com.CollegeHub.teacher.controller;
 
 import com.CollegeHub.admin.entity.Users;
 import com.CollegeHub.admin.repository.UserRepository;
+import com.CollegeHub.exception.ResourceNotFoundException;
 import com.CollegeHub.recording.dto.RecordingDetailsResponse;
-import com.CollegeHub.recording.entity.ClassRecording;
 import com.CollegeHub.recording.service.ClassRecordingService;
 import com.CollegeHub.teacher.dto.TeacherDetailsResponse;
 import com.CollegeHub.teacher.service.TeacherService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -15,15 +16,15 @@ import org.springframework.http.MediaTypeFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
+
 @RestController
-@RequestMapping("/api/teacher")
+@RequestMapping("/api/v1/teacher")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('TEACHER')")
 public class TeacherController {
@@ -43,7 +44,10 @@ public class TeacherController {
     }
 
     // Upload a class recording
-    @PostMapping(value = "/recordings", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(
+            value = "/recordings",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     public ResponseEntity<RecordingDetailsResponse> uploadRecording(
             @RequestParam String title,
             @RequestParam(required = false) String description,
@@ -57,17 +61,18 @@ public class TeacherController {
 
         Long teacherUserId = getTeacherUserId(authentication);
 
-        RecordingDetailsResponse recording = classRecordingService.uploadRecording(
-                title,
-                description,
-                subject,
-                classDate,
-                periodNumber,
-                branch,
-                year,
-                teacherUserId,
-                file
-        );
+        RecordingDetailsResponse recording =
+                classRecordingService.uploadRecording(
+                        title,
+                        description,
+                        subject,
+                        classDate,
+                        periodNumber,
+                        branch,
+                        year,
+                        teacherUserId,
+                        file
+                );
 
         return ResponseEntity.ok(recording);
     }
@@ -103,7 +108,7 @@ public class TeacherController {
 
         return ResponseEntity.ok()
                 .contentType(mediaType)
-                .header("Content-Disposition", "inline")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline")
                 .body(video);
     }
 
@@ -125,7 +130,7 @@ public class TeacherController {
 
         Users user = userRepository.findByEmail(authentication.getName())
                 .orElseThrow(() ->
-                        new RuntimeException("User not found"));
+                        new ResourceNotFoundException("User not found"));
 
         return user.getId();
     }
