@@ -1,5 +1,6 @@
 package com.CollegeHub.admin.AdminService;
 
+import com.CollegeHub.admin.entity.Role;
 import com.CollegeHub.student.dto.StudentDetailsDTO.StudentInfoRequest;
 import com.CollegeHub.student.dto.StudentDetailsDTO.StudentInfoResponse;
 import com.CollegeHub.teacher.dto.TeacherInfoRequest;
@@ -52,7 +53,7 @@ public class AdminServiceImpl implements AdminService{
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         System.out.println("Password is:-"+user.getPassword());
-        user.setRole(request.getRole());
+        user.setRole(Role.valueOf( request.getRole() ));
         user.setCreatedAt(LocalDateTime.now());
 
         userRepository.save(user);

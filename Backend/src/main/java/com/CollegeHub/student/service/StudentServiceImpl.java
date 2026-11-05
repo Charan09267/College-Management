@@ -1,5 +1,6 @@
 package com.CollegeHub.student.service;
 
+import com.CollegeHub.admin.entity.Role;
 import com.CollegeHub.student.dto.StudentDetailsDTO.StudentDetailsRes;
 import com.CollegeHub.student.entity.StudentInfo;
 import com.CollegeHub.admin.entity.Users;
@@ -33,7 +34,7 @@ public class StudentServiceImpl implements StudentService {
 
         response.setUserId(user.getId());
         response.setEmail(user.getEmail());
-        response.setRole(user.getRole());
+        response.setRole( user.getRole().name() );
 
         response.setName(student.getName());
         response.setRollNumber(student.getRollNumber());

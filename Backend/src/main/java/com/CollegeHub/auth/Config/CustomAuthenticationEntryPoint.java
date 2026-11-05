@@ -1,4 +1,4 @@
-package com.CollegeHub.Config;
+package com.CollegeHub.auth.Config;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

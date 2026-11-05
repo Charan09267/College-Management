@@ -1,4 +1,4 @@
-package com.CollegeHub.Config;
+package com.CollegeHub.auth.Config;
 
 import com.CollegeHub.Filter.JwtFilter;
 import com.CollegeHub.auth.AppUserDetailsService;
@@ -20,7 +20,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 import java.util.List;
 
@@ -35,25 +34,52 @@ public class SecurityConfig {
     private final JwtFilter jwtFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http)
+            throws Exception {
+
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers( "/login" ,"/api/v1/auth/me","/logout").permitAll()
-                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/teacher/**").hasAnyRole("TEACHER" ,"ADMIN")
-                        .requestMatchers("/api/v1/students/**").hasAnyRole("STUDENT" , "ADMIN")
-                        .anyRequest().authenticated())
-                .sessionManagement( session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
+                        .requestMatchers(
+                                "/login",
+                                "/api/v1/auth/me",
+                                "/logout",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**"
+                        ).permitAll()
+
+                        .requestMatchers("/api/v1/admin/**")
+                        .hasRole("ADMIN")
+
+                        .requestMatchers("/api/v1/teacher/**")
+                        .hasAnyRole("TEACHER", "ADMIN")
+
+                        .requestMatchers("/api/v1/student/**")
+                        .hasAnyRole("STUDENT", "ADMIN")
+
+                        .anyRequest().authenticated()
                 )
+
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(
+                                SessionCreationPolicy.STATELESS
+                        )
+                )
+
                 .logout(AbstractHttpConfigurer::disable)
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(customAuthenticationEntryPoint));
 
+                .addFilterBefore(
+                        jwtFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                )
 
+                .exceptionHandling(ex ->
+                        ex.authenticationEntryPoint(customAuthenticationEntryPoint)
+                );
 
         return http.build();
     }
@@ -63,42 +89,44 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // custom cors filter configuration or else default is provided....
     @Bean
-    public CorsFilter corsFilter(){
-        return new CorsFilter(corsConfigurationSource());
-    }
+    public CorsConfigurationSource corsConfigurationSource() {
 
-    private CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config =  new CorsConfiguration();
+        CorsConfiguration config = new CorsConfiguration();
+
         config.setAllowedOrigins(List.of("http://localhost:5173"));
-        config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
 
-//  Allow common + multimedia headers
+        config.setAllowedMethods(List.of(
+                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
+        ));
+
         config.setAllowedHeaders(List.of(
                 "Authorization",
                 "Content-Type",
                 "Accept",
                 "Origin",
                 "X-Requested-With",
-                "Range"                 // Needed for video streaming
+                "Range"
         ));
 
         config.setExposedHeaders(List.of(
                 "Authorization",
                 "Content-Type",
                 "Content-Length",
-                "Content-Range",        //  Required for video/audio streaming
+                "Content-Range",
                 "Accept-Ranges"
         ));
 
         config.setAllowCredentials(true);
 
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**",config);
+        source.registerCorsConfiguration("/**", config);
+
         return source;
     }
+
 
 
     //custom authentication manager bean , with dao authentication...

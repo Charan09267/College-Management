@@ -29,7 +29,8 @@ public class Users {
     @JsonIgnore
     private String password;
 
-    private String role; // STUDENT | TEACHER | ADMIN
+    @Enumerated(EnumType.STRING)
+    private Role role; // STUDENT | TEACHER | ADMIN
 
     private LocalDateTime createdAt;
 }
