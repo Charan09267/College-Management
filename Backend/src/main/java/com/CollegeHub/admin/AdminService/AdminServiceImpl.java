@@ -25,9 +25,10 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+
 @Service
 @RequiredArgsConstructor
-public class AdminServiceImpl implements AdminService{
+public class AdminServiceImpl implements AdminService {
 
     private final UserRepository userRepository;
     private final StudentInfoRepo studentInfoRepo;
@@ -36,37 +37,28 @@ public class AdminServiceImpl implements AdminService{
 
     @Override
     public ResponseEntity<UserCreateResponse> createUser(UserCreateRequest request) {
-        UserCreateResponse userCreateResponse = new UserCreateResponse();
 
-        userCreateResponse.setEmail(request.getEmail());
-
-
-
-        System.out.println("Inside the post method...");
+        UserCreateResponse response = new UserCreateResponse();
+        response.setEmail(request.getEmail());
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            userCreateResponse.setMessage("Email already exists of the user...");
-            return ResponseEntity.badRequest().body(userCreateResponse);
+            response.setMessage("Email already exists for another user.");
+            return ResponseEntity.badRequest().body(response);
         }
 
         Users user = new Users();
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        System.out.println("Password is:-"+user.getPassword());
-        user.setRole(Role.valueOf( request.getRole() ));
+        user.setRole(Role.valueOf(request.getRole().trim().toUpperCase()));
         user.setCreatedAt(LocalDateTime.now());
 
         userRepository.save(user);
 
-        userCreateResponse.setId(user.getId());
-        userCreateResponse.setMessage("User creation successfull....");
+        response.setId(user.getId());
+        response.setMessage("User created successfully.");
 
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(userCreateResponse);
-
-
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-
 
     @Override
     public ResponseEntity<StudentInfoResponse> addStudentInfo(
@@ -111,8 +103,6 @@ public class AdminServiceImpl implements AdminService{
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-
-
     @Override
     public ResponseEntity<TeacherInfoResponse> addTeacherInfo(
             TeacherInfoRequest request) {
@@ -138,16 +128,19 @@ public class AdminServiceImpl implements AdminService{
         teacherInfo.setProfileImageUrl(request.getProfileImageUrl());
         teacherInfo.setDepartment(request.getDepartment());
         teacherInfo.setDesignation(request.getDesignation());
+
         teacherInfo.setAssignedSubjects(
                 request.getAssignedSubjects() == null
                         ? List.of()
                         : request.getAssignedSubjects()
         );
+
         teacherInfo.setAssignedClasses(
                 request.getAssignedClasses() == null
                         ? List.of()
                         : request.getAssignedClasses()
         );
+
         teacherInfo.setProfileStatus(ProfileStatus.ACTIVE);
         teacherInfo.setCreatedAt(now);
         teacherInfo.setUpdatedAt(now);
@@ -156,22 +149,19 @@ public class AdminServiceImpl implements AdminService{
 
         TeacherInfoResponse response = new TeacherInfoResponse(
                 teacherInfo.getTeacherId(),
-                "Teacher's information has been created"
+                "Teacher information created successfully."
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-
     @Override
     public ResponseEntity<List<Users>> allUers() {
-        return ResponseEntity.status(HttpStatus.OK).body(userRepository.findAll());
+        return ResponseEntity.ok(userRepository.findAll());
     }
 
-
     @Override
-    public ResponseEntity<StudentDetailsResponse> getStudentUserById(
-            Long id) {
+    public ResponseEntity<StudentDetailsResponse> getStudentUserById(Long id) {
 
         Users user = userRepository.findById(id)
                 .orElseThrow(() ->
@@ -179,8 +169,7 @@ public class AdminServiceImpl implements AdminService{
 
         StudentInfo studentInfo = studentInfoRepo.findByUserId(id)
                 .orElseThrow(() ->
-                        new UsernameNotFoundException(
-                                "Student profile not found"));
+                        new UsernameNotFoundException("Student profile not found"));
 
         StudentDetailsResponse response = new StudentDetailsResponse();
         response.setId(user.getId());
@@ -193,3 +182,4 @@ public class AdminServiceImpl implements AdminService{
         return ResponseEntity.ok(response);
     }
 }
+

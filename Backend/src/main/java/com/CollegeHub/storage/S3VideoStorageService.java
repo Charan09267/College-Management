@@ -98,10 +98,18 @@ public class S3VideoStorageService implements VideoStorageService {
             ResponseInputStream<GetObjectResponse> inputStream =
                     s3Client.getObject(request);
 
+            long contentLength = inputStream.response().contentLength();
+
             return new InputStreamResource(inputStream) {
+
                 @Override
                 public String getDescription() {
                     return "S3 video resource: " + videoPath;
+                }
+
+                @Override
+                public long contentLength() {
+                    return contentLength;
                 }
             };
 
@@ -113,6 +121,7 @@ public class S3VideoStorageService implements VideoStorageService {
             );
         }
     }
+
 
     // Delete video from S3
     @Override
