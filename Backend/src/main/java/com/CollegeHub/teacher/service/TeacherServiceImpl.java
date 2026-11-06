@@ -1,6 +1,7 @@
 package com.CollegeHub.teacher.service;
 
 
+import com.CollegeHub.admin.entity.Branch;
 import com.CollegeHub.admin.entity.Users;
 import com.CollegeHub.admin.repository.UserRepository;
 import com.CollegeHub.teacher.dto.TeacherDetailsResponse;
@@ -37,7 +38,7 @@ public class TeacherServiceImpl implements TeacherService {
         response.setRole(user.getRole().name());
 
         response.setName(teacher.getName());
-        response.setDepartment(teacher.getDepartment());
+        response.setDepartment( teacher.getDepartment().name() );
         response.setDesignation(teacher.getDesignation());
         response.setAssignedSubjects(teacher.getAssignedSubjects());
 

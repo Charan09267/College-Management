@@ -1,6 +1,9 @@
 package com.CollegeHub.teacher.entity;
 
+import com.CollegeHub.admin.entity.Branch;
 import com.CollegeHub.admin.entity.ProfileStatus;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,7 +37,8 @@ public class TeacherInfo {
 
     private String profileImageUrl;
 
-    private String department;
+    @Enumerated(EnumType.STRING)
+    private Branch department;
 
     private String designation;
 

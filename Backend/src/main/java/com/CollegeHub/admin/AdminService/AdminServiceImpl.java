@@ -1,5 +1,6 @@
 package com.CollegeHub.admin.AdminService;
 
+import com.CollegeHub.admin.entity.Branch;
 import com.CollegeHub.admin.entity.Role;
 import com.CollegeHub.student.dto.StudentDetailsDTO.StudentInfoRequest;
 import com.CollegeHub.student.dto.StudentDetailsDTO.StudentInfoResponse;
@@ -84,7 +85,7 @@ public class AdminServiceImpl implements AdminService {
         studentInfo.setRollNumber(request.getRollNumber());
         studentInfo.setProfileImageUrl(request.getProfileImageUrl());
         studentInfo.setBranch(request.getBranch());
-        studentInfo.setDepartment(request.getDepartment());
+        studentInfo.setDepartment( Branch.valueOf( request.getDepartment()) );
         studentInfo.setYear(request.getYear());
         studentInfo.setSection(request.getSection());
         studentInfo.setBatch(request.getBatch());
@@ -126,7 +127,7 @@ public class AdminServiceImpl implements AdminService {
         teacherInfo.setName(request.getName());
         teacherInfo.setTeacherId(request.getTeacherId());
         teacherInfo.setProfileImageUrl(request.getProfileImageUrl());
-        teacherInfo.setDepartment(request.getDepartment());
+        teacherInfo.setDepartment(Branch.valueOf( request.getDepartment()) );
         teacherInfo.setDesignation(request.getDesignation());
 
         teacherInfo.setAssignedSubjects(
