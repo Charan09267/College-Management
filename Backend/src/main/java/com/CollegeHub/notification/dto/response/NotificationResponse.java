@@ -1,10 +1,7 @@
 package com.CollegeHub.notification.dto.response;
 
 
-import com.CollegeHub.notification.enums.NotificationCategory;
-import com.CollegeHub.notification.enums.NotificationPriority;
-import com.CollegeHub.notification.enums.NotificationStatus;
-import com.CollegeHub.notification.enums.RecipientRole;
+import com.CollegeHub.notification.enums.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -27,7 +24,7 @@ public class NotificationResponse {
 
     private Long createdByUserId;
 
-    private RecipientRole createdByRole;
+    private PublisherRole createdByRole;
 
     private String createdByName;
 

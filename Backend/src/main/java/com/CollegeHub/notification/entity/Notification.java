@@ -1,9 +1,6 @@
 package com.CollegeHub.notification.entity;
 
-import com.CollegeHub.notification.enums.NotificationCategory;
-import com.CollegeHub.notification.enums.NotificationPriority;
-import com.CollegeHub.notification.enums.NotificationStatus;
-import com.CollegeHub.notification.enums.RecipientRole;
+import com.CollegeHub.notification.enums.*;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -40,7 +37,7 @@ public class Notification {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "created_by_role", nullable = false, length = 20)
-    private RecipientRole createdByRole;
+    private PublisherRole createdByRole;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
