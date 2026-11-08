@@ -1,4 +1,4 @@
-package com.CollegeHub.notification.service;
+package com.CollegeHub.notification.service.impl;
 
 import com.CollegeHub.notification.dto.request.CreateNotificationRequest;
 import com.CollegeHub.notification.dto.request.NotificationTargetRequest;
@@ -10,6 +10,7 @@ import com.CollegeHub.notification.enums.*;
 import com.CollegeHub.notification.repository.NotificationOutboxRepository;
 import com.CollegeHub.notification.repository.NotificationRepository;
 import com.CollegeHub.notification.repository.NotificationTargetRepository;
+import com.CollegeHub.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
