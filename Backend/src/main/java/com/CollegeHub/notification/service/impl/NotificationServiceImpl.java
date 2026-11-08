@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @Service
@@ -26,6 +27,21 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationTargetRepository targetRepository;
     private final NotificationOutboxRepository outboxRepository;
+    private static final int MAX_ATTACHMENTS = 5;
+
+    private static final long MAX_FILE_SIZE =
+            10 * 1024 * 1024L;
+
+    private static final Map<String, String> ALLOWED_FILES = Map.of(
+            "pdf", "application/pdf",
+            "doc", "application/msword",
+            "docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "ppt", "application/vnd.ms-powerpoint",
+            "pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "jpg", "image/jpeg",
+            "jpeg", "image/jpeg",
+            "png", "image/png"
+    );
 
     @Override
     @Transactional
@@ -36,10 +52,10 @@ public class NotificationServiceImpl implements NotificationService {
             PublisherRole publisherRole
     ) {
 
-        // 1. Validate audience
+        validateAttachments(attachments);
+
         validateTargets(request.getTargets(), publisherRole);
 
-        // 2. Create notification
         Notification notification = Notification.builder()
                 .title(request.getTitle())
                 .message(request.getMessage())
@@ -142,6 +158,60 @@ public class NotificationServiceImpl implements NotificationService {
                     && (target.getYear() < 1 || target.getYear() > 4)) {
                 throw new IllegalArgumentException(
                         "Year must be between 1 and 4"
+                );
+            }
+        }
+    }
+
+    private void validateAttachments(List<MultipartFile> attachments) {
+
+        if (attachments == null || attachments.isEmpty()) {
+            return;
+        }
+
+        if (attachments.size() > MAX_ATTACHMENTS) {
+            throw new IllegalArgumentException(
+                    "Maximum 5 attachments are allowed"
+            );
+        }
+
+        for (MultipartFile file : attachments) {
+
+            if (file == null || file.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Attachment cannot be empty"
+                );
+            }
+
+            if (file.getSize() > MAX_FILE_SIZE) {
+                throw new IllegalArgumentException(
+                        "Each attachment must be smaller than or equal to 10 MB"
+                );
+            }
+
+            String fileName = file.getOriginalFilename();
+
+            if (fileName == null || !fileName.contains(".")) {
+                throw new IllegalArgumentException(
+                        "Invalid attachment filename"
+                );
+            }
+
+            String extension = fileName.substring(
+                    fileName.lastIndexOf(".") + 1
+            ).toLowerCase(Locale.ROOT);
+
+            String expectedContentType = ALLOWED_FILES.get(extension);
+
+            if (expectedContentType == null) {
+                throw new IllegalArgumentException(
+                        "Unsupported attachment format: " + extension
+                );
+            }
+
+            if (!expectedContentType.equalsIgnoreCase(file.getContentType())) {
+                throw new IllegalArgumentException(
+                        "Invalid content type for file: " + fileName
                 );
             }
         }
