@@ -30,7 +30,9 @@ public class TeacherInfo {
     @Indexed(unique = true)
     private Long userId;
 
-    private String name;
+    private String firstName;
+    private String middleName;
+    private String lastName;
 
     @Indexed(unique = true)
     private String teacherId;

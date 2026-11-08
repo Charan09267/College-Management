@@ -4,6 +4,7 @@ import com.CollegeHub.notification.dto.request.CreateNotificationRequest;
 import com.CollegeHub.notification.dto.request.NotificationTargetRequest;
 import com.CollegeHub.notification.dto.response.NotificationAttachmentResponse;
 import com.CollegeHub.notification.dto.response.NotificationResponse;
+import com.CollegeHub.notification.dto.response.NotificationTargetResponse;
 import com.CollegeHub.notification.entity.Notification;
 import com.CollegeHub.notification.entity.NotificationAttachment;
 import com.CollegeHub.notification.entity.NotificationOutbox;
@@ -15,6 +16,8 @@ import com.CollegeHub.notification.repository.NotificationRepository;
 import com.CollegeHub.notification.repository.NotificationTargetRepository;
 import com.CollegeHub.notification.service.NotificationAttachmentStorageService;
 import com.CollegeHub.notification.service.NotificationService;
+import com.CollegeHub.teacher.entity.TeacherInfo;
+import com.CollegeHub.teacher.repository.TeacherInfoRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,6 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +43,7 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationOutboxRepository outboxRepository;
     private final NotificationAttachmentRepository attachmentRepository;
     private final NotificationAttachmentStorageService attachmentStorageService;
+    private final TeacherInfoRepo teacherProfileRepository;
 
     private static final int MAX_ATTACHMENTS = 5;
 
@@ -114,7 +120,6 @@ public class NotificationServiceImpl implements NotificationService {
 
         outboxRepository.save(outbox);
 
-        // 5. Return response
         return NotificationResponse.builder()
                 .id(savedNotification.getId())
                 .title(savedNotification.getTitle())
@@ -122,11 +127,13 @@ public class NotificationServiceImpl implements NotificationService {
                 .category(savedNotification.getCategory())
                 .createdByUserId(savedNotification.getCreatedByUserId())
                 .createdByRole(savedNotification.getCreatedByRole())
+                .createdByName(getPublisherName(savedNotification))
                 .priority(savedNotification.getPriority())
                 .status(savedNotification.getStatus())
                 .createdAt(savedNotification.getCreatedAt())
                 .updatedAt(savedNotification.getUpdatedAt())
                 .expiresAt(savedNotification.getExpiresAt())
+                .targets(mapTargets(savedNotification.getId()))
                 .attachments(attachmentResponses)
                 .build();
     }
@@ -295,6 +302,57 @@ public class NotificationServiceImpl implements NotificationService {
                 attachmentRepository.saveAll(savedAttachments);
 
         return persistedAttachments.stream()
+                .map(attachment -> NotificationAttachmentResponse.builder()
+                        .id(attachment.getId())
+                        .fileName(attachment.getFileName())
+                        .contentType(attachment.getContentType())
+                        .fileSize(attachment.getFileSize())
+                        .createdAt(attachment.getCreatedAt())
+                        .build())
+                .toList();
+    }
+
+    private String getPublisherName(Notification notification) {
+
+        if (notification.getCreatedByRole() == PublisherRole.ADMIN) {
+            return "Admin";
+        }
+
+        TeacherInfo teacher = teacherProfileRepository
+                .findByUserId(notification.getCreatedByUserId())
+                .orElseThrow(() -> new IllegalStateException(
+                        "Teacher profile not found"
+                ));
+
+        return Stream.of(
+                        teacher.getFirstName(),
+                        teacher.getMiddleName(),
+                        teacher.getLastName()
+                )
+                .filter(name -> name != null && !name.isBlank())
+                .collect(Collectors.joining(" "));
+    }
+
+    private List<NotificationTargetResponse> mapTargets(Long notificationId) {
+
+        return targetRepository.findByNotificationId(notificationId)
+                .stream()
+                .map(target -> NotificationTargetResponse.builder()
+                        .recipientRole(target.getRecipientRole())
+                        .branch(target.getBranch())
+                        .year(target.getYear())
+                        .section(target.getSection())
+                        .batch(target.getBatch())
+                        .build())
+                .toList();
+    }
+
+    private List<NotificationAttachmentResponse> mapAttachments(
+            Long notificationId
+    ) {
+
+        return attachmentRepository.findByNotificationId(notificationId)
+                .stream()
                 .map(attachment -> NotificationAttachmentResponse.builder()
                         .id(attachment.getId())
                         .fileName(attachment.getFileName())
