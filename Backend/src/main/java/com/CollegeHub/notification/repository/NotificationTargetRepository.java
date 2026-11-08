@@ -1,4 +1,4 @@
-package com.CollegeHub.admin.repository;
+package com.CollegeHub.notification.repository;
 
 import com.CollegeHub.notification.entity.NotificationTarget;
 import org.springframework.data.jpa.repository.JpaRepository;

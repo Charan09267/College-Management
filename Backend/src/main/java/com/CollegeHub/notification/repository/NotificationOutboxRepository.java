@@ -1,4 +1,4 @@
-package com.CollegeHub.admin.repository;
+package com.CollegeHub.notification.repository;
 
 import com.CollegeHub.notification.entity.NotificationOutbox;
 import com.CollegeHub.notification.enums.OutboxStatus;

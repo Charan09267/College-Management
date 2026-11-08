@@ -1,4 +1,4 @@
-package com.CollegeHub.admin.repository;
+package com.CollegeHub.notification.repository;
 
 import com.CollegeHub.notification.entity.NotificationRecipient;
 import org.springframework.data.domain.Page;
