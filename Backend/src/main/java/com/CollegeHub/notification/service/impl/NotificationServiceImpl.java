@@ -2,31 +2,43 @@ package com.CollegeHub.notification.service.impl;
 
 import com.CollegeHub.notification.dto.request.CreateNotificationRequest;
 import com.CollegeHub.notification.dto.request.NotificationTargetRequest;
+import com.CollegeHub.notification.dto.response.NotificationAttachmentResponse;
 import com.CollegeHub.notification.dto.response.NotificationResponse;
 import com.CollegeHub.notification.entity.Notification;
+import com.CollegeHub.notification.entity.NotificationAttachment;
 import com.CollegeHub.notification.entity.NotificationOutbox;
 import com.CollegeHub.notification.entity.NotificationTarget;
 import com.CollegeHub.notification.enums.*;
+import com.CollegeHub.notification.repository.NotificationAttachmentRepository;
 import com.CollegeHub.notification.repository.NotificationOutboxRepository;
 import com.CollegeHub.notification.repository.NotificationRepository;
 import com.CollegeHub.notification.repository.NotificationTargetRepository;
+import com.CollegeHub.notification.service.NotificationAttachmentStorageService;
 import com.CollegeHub.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final NotificationTargetRepository targetRepository;
     private final NotificationOutboxRepository outboxRepository;
+    private final NotificationAttachmentRepository attachmentRepository;
+    private final NotificationAttachmentStorageService attachmentStorageService;
+
     private static final int MAX_ATTACHMENTS = 5;
 
     private static final long MAX_FILE_SIZE =
@@ -73,7 +85,6 @@ public class NotificationServiceImpl implements NotificationService {
         Notification savedNotification =
                 notificationRepository.save(notification);
 
-        // 3. Save audience targets
         List<NotificationTarget> targets = request.getTargets()
                 .stream()
                 .map(target -> NotificationTarget.builder()
@@ -88,7 +99,9 @@ public class NotificationServiceImpl implements NotificationService {
 
         targetRepository.saveAll(targets);
 
-        // 4. Create outbox event
+        List<NotificationAttachmentResponse> attachmentResponses =
+                saveAttachments(savedNotification, attachments);
+
         NotificationOutbox outbox = NotificationOutbox.builder()
                 .notification(savedNotification)
                 .eventType("NOTIFICATION_CREATED")
@@ -114,7 +127,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .createdAt(savedNotification.getCreatedAt())
                 .updatedAt(savedNotification.getUpdatedAt())
                 .expiresAt(savedNotification.getExpiresAt())
-                .attachments(List.of())
+                .attachments(attachmentResponses)
                 .build();
     }
 
@@ -215,5 +228,80 @@ public class NotificationServiceImpl implements NotificationService {
                 );
             }
         }
+    }
+
+    private void registerS3RollbackCleanup(List<String> uploadedKeys) {
+
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+
+                    @Override
+                    public void afterCompletion(int status) {
+
+                        if (status == STATUS_ROLLED_BACK) {
+
+                            for (String key : uploadedKeys) {
+                                try {
+                                    attachmentStorageService.deleteFile(key);
+                                } catch (Exception exception) {
+                                    log.error(
+                                            "Failed to clean up S3 attachment: {}",
+                                            key,
+                                            exception
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+        );
+    }
+
+    private List<NotificationAttachmentResponse> saveAttachments(
+            Notification notification,
+            List<MultipartFile> attachments
+    ) {
+
+        if (attachments == null || attachments.isEmpty()) {
+            return List.of();
+        }
+
+        List<String> uploadedKeys = new ArrayList<>();
+
+        // Register cleanup before uploading anything
+        registerS3RollbackCleanup(uploadedKeys);
+
+        List<NotificationAttachment> savedAttachments = new ArrayList<>();
+
+        for (MultipartFile file : attachments) {
+
+            String objectKey = attachmentStorageService.uploadFile(file);
+
+            uploadedKeys.add(objectKey);
+
+            NotificationAttachment attachment =
+                    NotificationAttachment.builder()
+                            .notification(notification)
+                            .fileName(file.getOriginalFilename())
+                            .s3ObjectKey(objectKey)
+                            .contentType(file.getContentType())
+                            .fileSize(file.getSize())
+                            .build();
+
+            savedAttachments.add(attachment);
+        }
+
+        List<NotificationAttachment> persistedAttachments =
+                attachmentRepository.saveAll(savedAttachments);
+
+        return persistedAttachments.stream()
+                .map(attachment -> NotificationAttachmentResponse.builder()
+                        .id(attachment.getId())
+                        .fileName(attachment.getFileName())
+                        .contentType(attachment.getContentType())
+                        .fileSize(attachment.getFileSize())
+                        .createdAt(attachment.getCreatedAt())
+                        .build())
+                .toList();
     }
 }
