@@ -43,8 +43,7 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationOutboxRepository outboxRepository;
     private final NotificationAttachmentRepository attachmentRepository;
     private final NotificationAttachmentStorageService attachmentStorageService;
-    private final TeacherInfoRepo teacherProfileRepository;
-
+    private final TeacherInfoRepo teacherInfoRepository;
     private static final int MAX_ATTACHMENTS = 5;
 
     private static final long MAX_FILE_SIZE =
@@ -318,7 +317,7 @@ public class NotificationServiceImpl implements NotificationService {
             return "Admin";
         }
 
-        TeacherInfo teacher = teacherProfileRepository
+        TeacherInfo teacher = teacherInfoRepository
                 .findByUserId(notification.getCreatedByUserId())
                 .orElseThrow(() -> new IllegalStateException(
                         "Teacher profile not found"
@@ -332,7 +331,6 @@ public class NotificationServiceImpl implements NotificationService {
                 .filter(name -> name != null && !name.isBlank())
                 .collect(Collectors.joining(" "));
     }
-
     private List<NotificationTargetResponse> mapTargets(Long notificationId) {
 
         return targetRepository.findByNotificationId(notificationId)
