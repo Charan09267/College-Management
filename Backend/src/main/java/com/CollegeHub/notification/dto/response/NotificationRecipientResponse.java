@@ -1,6 +1,7 @@
 package com.CollegeHub.notification.dto.response;
 import com.CollegeHub.notification.enums.NotificationCategory;
 import com.CollegeHub.notification.enums.NotificationPriority;
+import com.CollegeHub.notification.enums.PublisherRole;
 import com.CollegeHub.notification.enums.RecipientRole;
 import lombok.*;
 
@@ -24,7 +25,7 @@ public class NotificationRecipientResponse {
 
     private String createdByName;
 
-    private RecipientRole createdByRole;
+    private PublisherRole createdByRole;
 
     private NotificationPriority priority;
 
