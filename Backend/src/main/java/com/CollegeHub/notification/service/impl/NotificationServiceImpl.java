@@ -1,7 +1,9 @@
 package com.CollegeHub.notification.service.impl;
 
+import com.CollegeHub.exception.ResourceNotFoundException;
 import com.CollegeHub.notification.dto.request.CreateNotificationRequest;
 import com.CollegeHub.notification.dto.request.NotificationTargetRequest;
+import com.CollegeHub.notification.dto.request.UpdateNotificationRequest;
 import com.CollegeHub.notification.dto.response.NotificationAttachmentResponse;
 import com.CollegeHub.notification.dto.response.NotificationResponse;
 import com.CollegeHub.notification.dto.response.NotificationTargetResponse;
@@ -20,6 +22,7 @@ import com.CollegeHub.teacher.entity.TeacherInfo;
 import com.CollegeHub.teacher.repository.TeacherInfoRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -136,6 +139,8 @@ public class NotificationServiceImpl implements NotificationService {
                 .attachments(attachmentResponses)
                 .build();
     }
+
+
 
     private void validateTargets(
             List<NotificationTargetRequest> targets,
@@ -359,5 +364,191 @@ public class NotificationServiceImpl implements NotificationService {
                         .createdAt(attachment.getCreatedAt())
                         .build())
                 .toList();
+    }
+
+    private Notification getOwnedNotification(
+            Long notificationId,
+            Long publisherId,
+            PublisherRole publisherRole
+    ) {
+
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Notification not found")
+                );
+
+        if (!notification.getCreatedByUserId().equals(publisherId)
+                || notification.getCreatedByRole() != publisherRole) {
+
+            throw new AccessDeniedException(
+                    "You are not authorized to manage this notification"
+            );
+        }
+
+        return notification;
+    }
+    private void validateNotificationStatus(Notification notification) {
+
+        if (notification.getStatus() != NotificationStatus.PUBLISHED) {
+            throw new IllegalStateException(
+                    "Only published notifications can be managed"
+            );
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public NotificationResponse getNotificationById(
+            Long notificationId,
+            Long publisherId,
+            PublisherRole publisherRole
+    ) {
+
+        Notification notification = getOwnedNotification(
+                notificationId,
+                publisherId,
+                publisherRole
+        );
+
+        validateNotificationStatus(notification);
+
+        return NotificationResponse.builder()
+                .id(notification.getId())
+                .title(notification.getTitle())
+                .message(notification.getMessage())
+                .category(notification.getCategory())
+                .createdByUserId(notification.getCreatedByUserId())
+                .createdByRole(notification.getCreatedByRole())
+                .createdByName(getPublisherName(notification))
+                .priority(notification.getPriority())
+                .status(notification.getStatus())
+                .createdAt(notification.getCreatedAt())
+                .updatedAt(notification.getUpdatedAt())
+                .publishedAt(notification.getPublishedAt())
+                .expiresAt(notification.getExpiresAt())
+                .targets(mapTargets(notification.getId()))
+                .attachments(mapAttachments(notification.getId()))
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public NotificationResponse updateNotification(
+            Long notificationId,
+            UpdateNotificationRequest request,
+            List<MultipartFile> attachments,
+            Long publisherId,
+            PublisherRole publisherRole
+    ) {
+
+        Notification notification = getOwnedNotification(
+                notificationId,
+                publisherId,
+                publisherRole
+        );
+
+        validateNotificationStatus(notification);
+
+        notification.setTitle(request.getTitle());
+        notification.setMessage(request.getMessage());
+
+        if (attachments != null) {
+
+            validateAttachments(attachments);
+
+            List<NotificationAttachment> existingAttachments =
+                    attachmentRepository.findByNotificationId(notificationId);
+
+            List<String> oldKeys = existingAttachments.stream()
+                    .map(NotificationAttachment::getS3ObjectKey)
+                    .toList();
+
+            attachmentRepository.deleteAll(existingAttachments);
+
+            registerS3RollbackCleanup(new ArrayList<>());
+
+            List<NotificationAttachmentResponse> newAttachments =
+                    saveAttachments(notification, attachments);
+
+            // Delete old S3 objects only after the database transaction commits.
+            registerS3CommitCleanup(oldKeys);
+        }
+
+        Notification savedNotification = notificationRepository.save(notification);
+
+        return NotificationResponse.builder()
+                .id(savedNotification.getId())
+                .title(savedNotification.getTitle())
+                .message(savedNotification.getMessage())
+                .category(savedNotification.getCategory())
+                .createdByUserId(savedNotification.getCreatedByUserId())
+                .createdByRole(savedNotification.getCreatedByRole())
+                .createdByName(getPublisherName(savedNotification))
+                .priority(savedNotification.getPriority())
+                .status(savedNotification.getStatus())
+                .createdAt(savedNotification.getCreatedAt())
+                .updatedAt(savedNotification.getUpdatedAt())
+                .publishedAt(savedNotification.getPublishedAt())
+                .expiresAt(savedNotification.getExpiresAt())
+                .targets(mapTargets(savedNotification.getId()))
+                .attachments(mapAttachments(savedNotification.getId()))
+                .build();
+    }
+    @Override
+    @Transactional
+    public void deleteNotification(
+            Long notificationId,
+            Long publisherId,
+            PublisherRole publisherRole
+    ) {
+
+        Notification notification = getOwnedNotification(
+                notificationId,
+                publisherId,
+                publisherRole
+        );
+
+        validateNotificationStatus(notification);
+
+        List<NotificationAttachment> attachments =
+                attachmentRepository.findByNotificationId(notificationId);
+
+        List<String> objectKeys = attachments.stream()
+                .map(NotificationAttachment::getS3ObjectKey)
+                .toList();
+
+        attachmentRepository.deleteAll(attachments);
+
+        notificationRepository.delete(notification);
+
+        registerS3CommitCleanup(objectKeys);
+    }
+
+    private void registerS3CommitCleanup(List<String> objectKeys) {
+
+        if (objectKeys == null || objectKeys.isEmpty()) {
+            return;
+        }
+
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+
+                    @Override
+                    public void afterCommit() {
+
+                        for (String key : objectKeys) {
+                            try {
+                                attachmentStorageService.deleteFile(key);
+                            } catch (Exception e) {
+                                log.error(
+                                        "Failed to delete S3 attachment: {}",
+                                        key,
+                                        e
+                                );
+                            }
+                        }
+                    }
+                }
+        );
     }
 }
