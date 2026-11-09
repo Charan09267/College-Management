@@ -81,7 +81,7 @@ public class AdminServiceImpl implements AdminService {
 
         StudentInfo studentInfo = new StudentInfo();
         studentInfo.setUserId(user.getId());
-        studentInfo.setName(request.getName());
+        studentInfo.setFirstName(request.getName());
         studentInfo.setRollNumber(request.getRollNumber());
         studentInfo.setProfileImageUrl(request.getProfileImageUrl());
         studentInfo.setBranch(request.getBranch());
@@ -96,7 +96,7 @@ public class AdminServiceImpl implements AdminService {
         studentInfoRepo.save(studentInfo);
 
         StudentInfoResponse response = new StudentInfoResponse();
-        response.setName(studentInfo.getName());
+        response.setName(studentInfo.getFirstName());
         response.setRollNumber(studentInfo.getRollNumber());
         response.setBranch(studentInfo.getBranch());
         response.setYear(studentInfo.getYear());
@@ -175,7 +175,7 @@ public class AdminServiceImpl implements AdminService {
         StudentDetailsResponse response = new StudentDetailsResponse();
         response.setId(user.getId());
         response.setEmail(user.getEmail());
-        response.setName(studentInfo.getName());
+        response.setName(studentInfo.getFirstName());
         response.setYear(String.valueOf(studentInfo.getYear()));
         response.setRollNumber(studentInfo.getRollNumber());
         response.setBranch(studentInfo.getBranch());

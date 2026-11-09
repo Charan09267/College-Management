@@ -36,7 +36,7 @@ public class StudentServiceImpl implements StudentService {
         response.setEmail(user.getEmail());
         response.setRole( user.getRole().name() );
 
-        response.setName(student.getName());
+        response.setName(student.getFirstName());
         response.setRollNumber(student.getRollNumber());
         response.setBranch(student.getBranch());
         response.setYear( String.valueOf(student.getYear()) );
