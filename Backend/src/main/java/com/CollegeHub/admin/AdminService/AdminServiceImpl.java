@@ -124,7 +124,7 @@ public class AdminServiceImpl implements AdminService {
 
         TeacherInfo teacherInfo = new TeacherInfo();
         teacherInfo.setUserId(user.getId());
-        teacherInfo.setName(request.getName());
+        teacherInfo.setFirstName(request.getName());
         teacherInfo.setTeacherId(request.getTeacherId());
         teacherInfo.setProfileImageUrl(request.getProfileImageUrl());
         teacherInfo.setDepartment(Branch.valueOf( request.getDepartment()) );

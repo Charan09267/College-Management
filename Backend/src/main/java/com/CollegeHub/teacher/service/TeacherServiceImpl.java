@@ -37,7 +37,7 @@ public class TeacherServiceImpl implements TeacherService {
         response.setEmail(user.getEmail());
         response.setRole(user.getRole().name());
 
-        response.setName(teacher.getName());
+        response.setName(teacher.getFirstName() + " " + teacher.getLastName());
         response.setDepartment( teacher.getDepartment().name() );
         response.setDesignation(teacher.getDesignation());
         response.setAssignedSubjects(teacher.getAssignedSubjects());
