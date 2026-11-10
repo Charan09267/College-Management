@@ -336,6 +336,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .filter(name -> name != null && !name.isBlank())
                 .collect(Collectors.joining(" "));
     }
+
     private List<NotificationTargetResponse> mapTargets(Long notificationId) {
 
         return targetRepository.findByNotificationId(notificationId)
@@ -387,6 +388,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         return notification;
     }
+
     private void validateNotificationStatus(Notification notification) {
 
         if (notification.getStatus() != NotificationStatus.PUBLISHED) {
