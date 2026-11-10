@@ -46,7 +46,6 @@ public class AdminUserController {
 
     @PostMapping("users/teacher")
     public ResponseEntity<TeacherInfoResponse> addTeacherInfo(@RequestBody TeacherInfoRequest request){
-        System.out.println("Inside the controller....");
         return adminService.addTeacherInfo(request);
     }
 
