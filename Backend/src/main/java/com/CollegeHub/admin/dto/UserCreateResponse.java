@@ -1,4 +1,4 @@
-package com.CollegeHub.admin.dto.UserCreationDTO;
+package com.CollegeHub.admin.dto;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,13 +1,13 @@
 package com.CollegeHub.admin.AdminService;
 
+import com.CollegeHub.admin.dto.UserCreateResponse;
 import com.CollegeHub.admin.entity.Branch;
 import com.CollegeHub.admin.entity.Role;
 import com.CollegeHub.student.dto.StudentDetailsDTO.StudentInfoRequest;
 import com.CollegeHub.student.dto.StudentDetailsDTO.StudentInfoResponse;
 import com.CollegeHub.teacher.dto.TeacherInfoRequest;
 import com.CollegeHub.teacher.dto.TeacherInfoResponse;
-import com.CollegeHub.admin.dto.UserCreationDTO.UserCreateRequest;
-import com.CollegeHub.admin.dto.UserCreationDTO.UserCreateResponse;
+import com.CollegeHub.admin.dto.UserCreateRequest;
 import com.CollegeHub.student.dto.StudentDetailsResponse;
 import com.CollegeHub.admin.entity.ProfileStatus;
 import com.CollegeHub.student.entity.StudentInfo;
@@ -25,6 +25,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Service
@@ -81,11 +84,15 @@ public class AdminServiceImpl implements AdminService {
 
         StudentInfo studentInfo = new StudentInfo();
         studentInfo.setUserId(user.getId());
-        studentInfo.setFirstName(request.getName());
+        studentInfo.setFirstName(request.getFirstName());
+        studentInfo.setMiddleName(request.getMiddleName());
+        studentInfo.setLastName(request.getLastName());
         studentInfo.setRollNumber(request.getRollNumber());
         studentInfo.setProfileImageUrl(request.getProfileImageUrl());
         studentInfo.setBranch(request.getBranch());
-        studentInfo.setDepartment( Branch.valueOf( request.getDepartment()) );
+        studentInfo.setDepartment(Branch.valueOf(
+                request.getDepartment().trim().toUpperCase()
+        ));
         studentInfo.setYear(request.getYear());
         studentInfo.setSection(request.getSection());
         studentInfo.setBatch(request.getBatch());
@@ -96,7 +103,11 @@ public class AdminServiceImpl implements AdminService {
         studentInfoRepo.save(studentInfo);
 
         StudentInfoResponse response = new StudentInfoResponse();
-        response.setName(studentInfo.getFirstName());
+        response.setName(getFullName(
+                studentInfo.getFirstName(),
+                studentInfo.getMiddleName(),
+                studentInfo.getLastName()
+        ));
         response.setRollNumber(studentInfo.getRollNumber());
         response.setBranch(studentInfo.getBranch());
         response.setYear(studentInfo.getYear());
@@ -124,10 +135,16 @@ public class AdminServiceImpl implements AdminService {
 
         TeacherInfo teacherInfo = new TeacherInfo();
         teacherInfo.setUserId(user.getId());
-        teacherInfo.setFirstName(request.getName());
+
+        teacherInfo.setFirstName(request.getFirstName());
+        teacherInfo.setMiddleName(request.getMiddleName());
+        teacherInfo.setLastName(request.getLastName());
+
         teacherInfo.setTeacherId(request.getTeacherId());
         teacherInfo.setProfileImageUrl(request.getProfileImageUrl());
-        teacherInfo.setDepartment(Branch.valueOf( request.getDepartment()) );
+        teacherInfo.setDepartment(Branch.valueOf(
+                request.getDepartment().trim().toUpperCase()
+        ));
         teacherInfo.setDesignation(request.getDesignation());
 
         teacherInfo.setAssignedSubjects(
@@ -175,12 +192,32 @@ public class AdminServiceImpl implements AdminService {
         StudentDetailsResponse response = new StudentDetailsResponse();
         response.setId(user.getId());
         response.setEmail(user.getEmail());
-        response.setName(studentInfo.getFirstName());
+        response.setName(getFullName(
+                studentInfo.getFirstName(),
+                studentInfo.getMiddleName(),
+                studentInfo.getLastName()
+        ));
         response.setYear(String.valueOf(studentInfo.getYear()));
         response.setRollNumber(studentInfo.getRollNumber());
         response.setBranch(studentInfo.getBranch());
 
         return ResponseEntity.ok(response);
     }
-}
 
+    /**
+     * Combines first, middle, and last names into a single display name.
+     *
+     * @param firstName  user's first name
+     * @param middleName user's middle name (optional)
+     * @param lastName   user's last name
+     * @return complete name without unnecessary spaces
+     */
+    private String getFullName(String firstName, String middleName, String lastName) {
+
+        return Stream.of(firstName, middleName, lastName)
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(name -> !name.isEmpty())
+                .collect(Collectors.joining(" "));
+    }
+}

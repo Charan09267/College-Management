@@ -1,12 +1,12 @@
-package com.CollegeHub.admin;
+package com.CollegeHub.admin.controller;
 
+import com.CollegeHub.admin.dto.UserCreateRequest;
 import com.CollegeHub.student.dto.StudentDetailsDTO.StudentInfoRequest;
 import com.CollegeHub.student.dto.StudentDetailsDTO.StudentInfoResponse;
 import com.CollegeHub.student.dto.StudentDetailsUpdateDTO.UpdateResponse;
 import com.CollegeHub.teacher.dto.TeacherInfoRequest;
 import com.CollegeHub.teacher.dto.TeacherInfoResponse;
-import com.CollegeHub.admin.dto.UserCreationDTO.UserCreateRequest;
-import com.CollegeHub.admin.dto.UserCreationDTO.UserCreateResponse;
+import com.CollegeHub.admin.dto.UserCreateResponse;
 import com.CollegeHub.admin.entity.Users;
 import com.CollegeHub.admin.repository.UserRepository;
 import com.CollegeHub.admin.AdminService.AdminService;

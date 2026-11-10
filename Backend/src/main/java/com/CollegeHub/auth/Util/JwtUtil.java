@@ -1,4 +1,4 @@
-package com.CollegeHub.Util;
+package com.CollegeHub.auth.Util;
 
 
 import io.jsonwebtoken.Claims;

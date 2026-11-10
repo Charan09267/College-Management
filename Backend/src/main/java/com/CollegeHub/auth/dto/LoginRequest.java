@@ -1,4 +1,4 @@
-package com.CollegeHub.auth;
+package com.CollegeHub.auth.dto;
 
 
 import lombok.Getter;

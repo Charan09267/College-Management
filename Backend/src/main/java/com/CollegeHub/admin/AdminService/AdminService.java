@@ -1,11 +1,11 @@
 package com.CollegeHub.admin.AdminService;
 
+import com.CollegeHub.admin.dto.UserCreateResponse;
 import com.CollegeHub.student.dto.StudentDetailsDTO.StudentInfoRequest;
 import com.CollegeHub.student.dto.StudentDetailsDTO.StudentInfoResponse;
 import com.CollegeHub.teacher.dto.TeacherInfoRequest;
 import com.CollegeHub.teacher.dto.TeacherInfoResponse;
-import com.CollegeHub.admin.dto.UserCreationDTO.UserCreateRequest;
-import com.CollegeHub.admin.dto.UserCreationDTO.UserCreateResponse;
+import com.CollegeHub.admin.dto.UserCreateRequest;
 import com.CollegeHub.student.dto.StudentDetailsResponse;
 import com.CollegeHub.admin.entity.Users;
 import org.springframework.http.ResponseEntity;

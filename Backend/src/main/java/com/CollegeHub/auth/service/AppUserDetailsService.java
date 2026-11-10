@@ -1,4 +1,4 @@
-package com.CollegeHub.auth;
+package com.CollegeHub.auth.service;
 
 import com.CollegeHub.admin.entity.Users;
 import com.CollegeHub.admin.repository.UserRepository;

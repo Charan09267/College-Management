@@ -1,7 +1,7 @@
 package com.CollegeHub.auth.Config;
 
-import com.CollegeHub.Filter.JwtFilter;
-import com.CollegeHub.auth.AppUserDetailsService;
+import com.CollegeHub.auth.Filter.JwtFilter;
+import com.CollegeHub.auth.service.AppUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,7 +1,10 @@
-package com.CollegeHub.auth;
+package com.CollegeHub.auth.controller;
 
 
-import com.CollegeHub.Util.JwtUtil;
+import com.CollegeHub.auth.Util.JwtUtil;
+import com.CollegeHub.auth.service.AppUserDetailsService;
+import com.CollegeHub.auth.dto.LoginRequest;
+import com.CollegeHub.auth.dto.LoginResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

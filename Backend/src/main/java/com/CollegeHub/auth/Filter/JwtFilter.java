@@ -1,7 +1,7 @@
-package com.CollegeHub.Filter;
+package com.CollegeHub.auth.Filter;
 
-import com.CollegeHub.auth.AppUserDetailsService;
-import com.CollegeHub.Util.JwtUtil;
+import com.CollegeHub.auth.service.AppUserDetailsService;
+import com.CollegeHub.auth.Util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;

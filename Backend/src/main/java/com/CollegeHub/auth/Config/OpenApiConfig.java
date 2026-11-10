@@ -1,4 +1,4 @@
-package com.CollegeHub.auth;
+package com.CollegeHub.auth.Config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;

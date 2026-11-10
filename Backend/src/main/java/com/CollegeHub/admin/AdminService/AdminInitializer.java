@@ -1,4 +1,4 @@
-package com.CollegeHub.admin;
+package com.CollegeHub.admin.AdminService;
 
 import com.CollegeHub.admin.entity.Role;
 import com.CollegeHub.admin.entity.Users;
