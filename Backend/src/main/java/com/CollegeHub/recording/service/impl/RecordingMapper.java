@@ -1,4 +1,4 @@
-package com.CollegeHub.recording.service;
+package com.CollegeHub.recording.service.impl;
 
 
 import com.CollegeHub.recording.dto.RecordingDetailsResponse;

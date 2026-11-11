@@ -1,10 +1,11 @@
-package com.CollegeHub.recording.service;
+package com.CollegeHub.recording.service.impl;
 
 import com.CollegeHub.exception.ResourceAccessDeniedException;
 import com.CollegeHub.exception.ResourceNotFoundException;
 import com.CollegeHub.recording.dto.RecordingDetailsResponse;
 import com.CollegeHub.recording.entity.ClassRecording;
 import com.CollegeHub.recording.repository.ClassRecordingRepository;
+import com.CollegeHub.recording.service.ClassRecordingService;
 import com.CollegeHub.storage.VideoStorageService;
 import com.CollegeHub.student.entity.StudentInfo;
 import com.CollegeHub.student.repository.StudentInfoRepo;
