@@ -29,7 +29,7 @@ const Login = () => {
 
         try {
             await dispatch(loginUser(formData)).unwrap();
-            navigate("/dashboard");
+            navigate(`/${formData.role.toLowerCase()}/dashboard`);
         } catch (error) {
             // Error is stored in Redux state.
         }
