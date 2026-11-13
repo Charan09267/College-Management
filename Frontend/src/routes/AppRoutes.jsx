@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import AdminDashboard from "../pages/admin/AdminDashboard";
 
+import StudentRecordings from "../pages/student/StudentRecordings";
+
 import TeacherDashboard from "../pages/teacher/TeacherDashboard";
 
 import ProtectedRoute from "./ProtectedRoute";
@@ -28,10 +30,17 @@ const AppRoutes = () => {
 
                 {/* Student routes */}
                 <Route element={<ProtectedRoute allowedRoles={["STUDENT"]} />}>
-                    <Route element={<DashboardLayout />}>
-                        <Route path="/student/dashboard" element={<StudentDashboard />} />
-                    </Route>
-                </Route>
+    <Route element={<DashboardLayout />}>
+        <Route
+            path="/student/dashboard"
+            element={<StudentDashboard />}
+        />
+        <Route
+            path="/student/recordings"
+            element={<StudentRecordings />}
+        />
+    </Route>
+</Route>
 
                 {/* Teacher routes */}
                 <Route element={<ProtectedRoute allowedRoles={["TEACHER"]} />}>
