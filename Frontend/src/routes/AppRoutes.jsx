@@ -1,6 +1,7 @@
 
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
+import PublicRoute from "./PublicRoute";
 import AuthLayout from "../components/layout/AuthLayout";
 import Login from "../pages/auth/Login";
 
@@ -8,8 +9,10 @@ const AppRoutes = () => {
     return (
         <BrowserRouter>
             <Routes>
-                <Route element={<AuthLayout />}>
-                    <Route path="/login" element={<Login />} />
+                <Route element={<PublicRoute />}>
+                    <Route element={<AuthLayout />}>
+                        <Route path="/login" element={<Login />} />
+                    </Route>
                 </Route>
 
                 <Route element={<ProtectedRoute allowedRoles={["STUDENT"]} />}>
