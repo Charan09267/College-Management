@@ -5,6 +5,8 @@ import AdminDashboard from "../pages/admin/AdminDashboard";
 
 import StudentRecordings from "../pages/student/StudentRecordings";
 
+import CreateAnnouncement from "../pages/teacher/CreateAnnouncement";
+
 import StudentAnnouncements from "../pages/student/StudentAnnouncements";
 
 import TeacherDashboard from "../pages/teacher/TeacherDashboard";
@@ -60,6 +62,10 @@ const AppRoutes = () => {
             path="/teacher/recordings"
             element={<TeacherRecordings />}
         />
+        <Route
+    path="/teacher/announcements/create"
+    element={<CreateAnnouncement />}
+/>
     </Route>
 </Route>
 

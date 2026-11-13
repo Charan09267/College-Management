@@ -22,6 +22,11 @@ const navigation = {
         { name: "Dashboard", path: "dashboard", icon: LayoutDashboard },
         { name: "Recordings", path: "recordings", icon: Video },
         { name: "Announcements", path: "announcements", icon: Megaphone },
+        {
+            name: "Create Announcement",
+            path: "announcements/create",
+            icon: Megaphone,
+        },
         { name: "Profile", path: "profile", icon: UserCircle },
     ],
     ADMIN: [
