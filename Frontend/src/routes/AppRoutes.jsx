@@ -12,6 +12,7 @@ import PublicRoute from "./PublicRoute";
 
 import AuthLayout from "../components/layout/AuthLayout";
 import DashboardLayout from "../components/layout/DashboardLayout";
+import TeacherRecordings from "../pages/teacher/TeacherRecordings";
 
 import Login from "../pages/auth/Login";
 import StudentDashboard from "../pages/student/StudentDashboard";
@@ -44,13 +45,17 @@ const AppRoutes = () => {
 
                 {/* Teacher routes */}
                 <Route element={<ProtectedRoute allowedRoles={["TEACHER"]} />}>
-                    <Route element={<DashboardLayout />}>
-                        <Route
-                            path="/teacher/dashboard"
-                            element={<TeacherDashboard />}
-                        />
-                    </Route>
-                </Route>
+    <Route element={<DashboardLayout />}>
+        <Route
+            path="/teacher/dashboard"
+            element={<TeacherDashboard />}
+        />
+        <Route
+            path="/teacher/recordings"
+            element={<TeacherRecordings />}
+        />
+    </Route>
+</Route>
 
                 {/* Admin routes */}
                 <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
