@@ -25,15 +25,16 @@ const Login = () => {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+    e.preventDefault();
 
-        try {
-            await dispatch(loginUser(formData)).unwrap();
-            navigate(`/${formData.role.toLowerCase()}/dashboard`);
-        } catch (error) {
-            // Error is stored in Redux state.
-        }
-    };
+    try {
+        const user = await dispatch(loginUser(formData)).unwrap();
+
+        navigate(`/${user.role.toLowerCase()}/dashboard`);
+    } catch (error) {
+        // Error is handled by Redux.
+    }
+};
 
     return (
         <div>
