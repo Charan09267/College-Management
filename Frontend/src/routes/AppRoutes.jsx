@@ -11,6 +11,8 @@ import AdminAnnouncementDetails from "../pages/admin/AnnouncementDetails";
 
 import CreateAnnouncement from "../pages/teacher/CreateAnnouncement";
 
+import StudentAnnouncementDetails from "../pages/student/StudentAnnouncementDetails";
+
 import AnnouncementDetails from "../pages/teacher/AnnouncementDetails";
 
 import StudentAnnouncements from "../pages/student/StudentAnnouncements";
@@ -55,6 +57,10 @@ const AppRoutes = () => {
             path="/student/recordings"
             element={<StudentRecordings />}
         />
+        <Route
+    path="announcements/:notificationId"
+    element={<StudentAnnouncementDetails />}
+/>
         <Route
     path="/student/announcements"
     element={<StudentAnnouncements />}

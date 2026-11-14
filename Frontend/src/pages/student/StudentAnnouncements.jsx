@@ -6,6 +6,7 @@ import {
     Megaphone,
     CheckCheck,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import {
     getNotifications,
     getUnreadCount,
@@ -85,12 +86,12 @@ const StudentAnnouncements = () => {
     };
 
     const filteredNotifications = notifications.filter((notification) => {
-        if (filter === "EMERGENCY") {
-            return notification.priority === "EMERGENCY";
+        if (filter === "URGENT") {
+            return notification.priority === "URGENT";
         }
 
         if (filter === "REGULAR") {
-            return notification.priority !== "EMERGENCY";
+            return notification.priority !== "URGENT";
         }
 
         return true;
@@ -116,7 +117,7 @@ const StudentAnnouncements = () => {
 
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex gap-2">
-                    {["ALL", "EMERGENCY", "REGULAR"].map((item) => (
+                    {["ALL", "URGENT", "REGULAR"].map((item) => (
                         <button
                             key={item}
                             onClick={() => setFilter(item)}
@@ -128,8 +129,8 @@ const StudentAnnouncements = () => {
                         >
                             {item === "ALL"
                                 ? "All"
-                                : item === "EMERGENCY"
-                                  ? "Emergency"
+                                : item === "URGENT"
+                                  ? "URGENT"
                                   : "Regular"}
                         </button>
                     ))}
@@ -168,7 +169,7 @@ const StudentAnnouncements = () => {
                 <div className="space-y-4">
                     {filteredNotifications.map((notification) => {
                         const emergency =
-                            notification.priority === "EMERGENCY";
+                            notification.priority === "URGENT";
 
                         return (
                             <article
@@ -216,28 +217,36 @@ const StudentAnnouncements = () => {
                                     {notification.message}
                                 </p>
 
-                                <div className="flex flex-wrap justify-between items-center gap-3 mt-5 pt-4 border-t">
-                                    <span className="text-xs text-gray-500">
-                                        {notification.publishedAt
-                                            ? new Date(
-                                                  notification.publishedAt
-                                              ).toLocaleString()
-                                            : ""}
-                                    </span>
+                                
+<div className="flex flex-wrap justify-between items-center gap-3 mt-5 pt-4 border-t">
+    <span className="text-xs text-gray-500">
+        {notification.publishedAt
+            ? new Date(notification.publishedAt).toLocaleString()
+            : ""}
+    </span>
 
-                                    {!notification.read && (
-                                        <button
-                                            onClick={() =>
-                                                handleMarkAsRead(
-                                                    notification.notificationId
-                                                )
-                                            }
-                                            className="text-sm text-blue-600 hover:text-blue-800"
-                                        >
-                                            Mark as read
-                                        </button>
-                                    )}
-                                </div>
+    <div className="flex items-center gap-4">
+        <Link
+            to={`/student/announcements/${notification.notificationId}`}
+            state={{ notification }}
+            className="text-sm font-medium text-blue-600 hover:text-blue-800"
+        >
+            View Details
+        </Link>
+
+        {!notification.read && (
+            <button
+                onClick={() =>
+                    handleMarkAsRead(notification.notificationId)
+                }
+                className="text-sm text-blue-600 hover:text-blue-800"
+            >
+                Mark as read
+            </button>
+        )}
+    </div>
+</div>
+
                             </article>
                         );
                     })}
