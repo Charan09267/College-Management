@@ -20,6 +20,7 @@ import TeacherDashboard from "../pages/teacher/TeacherDashboard";
 import ProtectedRoute from "./ProtectedRoute";
 import PublicRoute from "./PublicRoute";
 
+import AdminEditAnnouncement from "../pages/admin/EditAnnouncement";
 import AuthLayout from "../components/layout/AuthLayout";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import TeacherRecordings from "../pages/teacher/TeacherRecordings";
@@ -98,6 +99,10 @@ const AppRoutes = () => {
                             path="/admin/dashboard"
                             element={<AdminDashboard />}
                         />
+                        <Route
+    path="announcements/:notificationId/edit"
+    element={<AdminEditAnnouncement />}
+/>
                         <Route
     path="announcements/:notificationId"
     element={<AdminAnnouncementDetails />}
