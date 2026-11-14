@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 
 import TeacherAnnouncements from "../pages/teacher/TeacherAnnouncements";
+import AdminAnnouncements from "../pages/admin/AdminAnnouncements";
 
 import StudentRecordings from "../pages/student/StudentRecordings";
 
@@ -96,6 +97,7 @@ const AppRoutes = () => {
                             path="/admin/dashboard"
                             element={<AdminDashboard />}
                         />
+                        <Route path="announcements" element={<AdminAnnouncements />} />
                         <Route
     path="/admin/announcements/create"
     element={<AdminCreateAnnouncement />}

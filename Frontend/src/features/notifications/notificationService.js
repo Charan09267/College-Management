@@ -8,6 +8,10 @@ export const getNotifications = async (page = 0, size = 10) => {
     return response.data;
 };
 
+export const deleteNotification = async (notificationId) => {
+    await api.delete(`/api/v1/notifications/manage/${notificationId}`);
+};
+
 export const createAdminNotification = async (request, attachments = []) => {
     const formData = new FormData();
 
