@@ -106,7 +106,7 @@ public class AuthController {
 
         Cookie cookie = new Cookie("token", null);
         cookie.setHttpOnly(true);
-        cookie.setSecure(true); // false if not using https
+        cookie.setSecure(false); // false if not using https
         cookie.setPath("/");
         cookie.setMaxAge(0); // delete cookie
 

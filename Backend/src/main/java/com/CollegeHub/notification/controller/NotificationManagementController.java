@@ -15,6 +15,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -101,5 +106,29 @@ public class NotificationManagementController {
                         authority.getAuthority().equals("ROLE_ADMIN"))
                 ? PublisherRole.ADMIN
                 : PublisherRole.TEACHER;
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<NotificationResponse>> getMyCreatedNotifications(
+            Authentication authentication,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Users user = getAuthenticatedUser(authentication);
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+
+        Page<NotificationResponse> response =
+                notificationService.getMyCreatedNotifications(
+                        user.getId(),
+                        getPublisherRole(authentication),
+                        pageable
+                );
+
+        return ResponseEntity.ok(response);
     }
 }

@@ -22,6 +22,8 @@ import com.CollegeHub.teacher.entity.TeacherInfo;
 import com.CollegeHub.teacher.repository.TeacherInfoRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -552,5 +554,38 @@ public class NotificationServiceImpl implements NotificationService {
                     }
                 }
         );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<NotificationResponse> getMyCreatedNotifications(
+            Long publisherId,
+            PublisherRole publisherRole,
+            Pageable pageable
+    ) {
+        return notificationRepository
+                .findByCreatedByUserIdAndCreatedByRoleOrderByCreatedAtDesc(
+                        publisherId,
+                        publisherRole,
+                        pageable
+                )
+                .map(notification -> NotificationResponse.builder()
+                        .id(notification.getId())
+                        .title(notification.getTitle())
+                        .message(notification.getMessage())
+                        .category(notification.getCategory())
+                        .createdByUserId(notification.getCreatedByUserId())
+                        .createdByRole(notification.getCreatedByRole())
+                        .createdByName(getPublisherName(notification))
+                        .priority(notification.getPriority())
+                        .status(notification.getStatus())
+                        .createdAt(notification.getCreatedAt())
+                        .updatedAt(notification.getUpdatedAt())
+                        .publishedAt(notification.getPublishedAt())
+                        .expiresAt(notification.getExpiresAt())
+                        .targets(mapTargets(notification.getId()))
+                        .attachments(mapAttachments(notification.getId()))
+                        .build()
+                );
     }
 }

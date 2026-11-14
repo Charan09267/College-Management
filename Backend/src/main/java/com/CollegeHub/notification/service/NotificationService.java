@@ -4,6 +4,8 @@ import com.CollegeHub.notification.dto.request.CreateNotificationRequest;
 import com.CollegeHub.notification.dto.request.UpdateNotificationRequest;
 import com.CollegeHub.notification.dto.response.NotificationResponse;
 import com.CollegeHub.notification.enums.PublisherRole;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -91,6 +93,12 @@ public interface NotificationService {
             Long notificationId,
             Long publisherId,
             PublisherRole publisherRole
+    );
+
+    Page<NotificationResponse> getMyCreatedNotifications(
+            Long publisherId,
+            PublisherRole publisherRole,
+            Pageable pageable
     );
 
 }
