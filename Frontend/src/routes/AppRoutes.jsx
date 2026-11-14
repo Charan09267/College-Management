@@ -7,6 +7,7 @@ import TeacherAnnouncements from "../pages/teacher/TeacherAnnouncements";
 import AdminAnnouncements from "../pages/admin/AdminAnnouncements";
 
 import StudentRecordings from "../pages/student/StudentRecordings";
+import AdminAnnouncementDetails from "../pages/admin/AnnouncementDetails";
 
 import CreateAnnouncement from "../pages/teacher/CreateAnnouncement";
 
@@ -97,6 +98,10 @@ const AppRoutes = () => {
                             path="/admin/dashboard"
                             element={<AdminDashboard />}
                         />
+                        <Route
+    path="announcements/:notificationId"
+    element={<AdminAnnouncementDetails />}
+/>
                         <Route path="announcements" element={<AdminAnnouncements />} />
                         <Route
     path="/admin/announcements/create"
