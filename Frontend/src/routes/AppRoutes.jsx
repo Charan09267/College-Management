@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import AdminDashboard from "../pages/admin/AdminDashboard";
 
+import TeacherAnnouncements from "../pages/teacher/TeacherAnnouncements";
+
 import StudentRecordings from "../pages/student/StudentRecordings";
 
 import CreateAnnouncement from "../pages/teacher/CreateAnnouncement";
@@ -62,6 +64,10 @@ const AppRoutes = () => {
             path="/teacher/recordings"
             element={<TeacherRecordings />}
         />
+        <Route
+    path="/teacher/announcements"
+    element={<TeacherAnnouncements />}
+/>
         <Route
     path="/teacher/announcements/create"
     element={<CreateAnnouncement />}
