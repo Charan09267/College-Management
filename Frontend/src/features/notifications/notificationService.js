@@ -8,6 +8,28 @@ export const getNotifications = async (page = 0, size = 10) => {
     return response.data;
 };
 
+export const createAdminNotification = async (request, attachments = []) => {
+    const formData = new FormData();
+
+    formData.append(
+        "request",
+        new Blob([JSON.stringify(request)], {
+            type: "application/json",
+        })
+    );
+
+    attachments.forEach((file) => {
+        formData.append("attachments", file);
+    });
+
+    const response = await api.post(
+        "/api/v1/admin/notifications",
+        formData
+    );
+
+    return response.data;
+};
+
 export const getUnreadCount = async () => {
     const response = await api.get(
         "/api/v1/student/notifications/unread-count"

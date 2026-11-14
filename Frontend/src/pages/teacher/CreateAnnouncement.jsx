@@ -1,7 +1,11 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { createTeacherNotification } from "../../features/notifications/notificationService";
+
+import {
+    createTeacherNotification,
+    createAdminNotification,
+} from "../../features/notifications/notificationService";
 
 const categories = [
     "GENERAL",
@@ -21,7 +25,7 @@ const categories = [
 const priorities = ["LOW", "NORMAL", "HIGH", "URGENT"];
 const recipientRoles = ["STUDENT", "TEACHER", "ALL"];
 
-const CreateAnnouncement = () => {
+const CreateAnnouncement = ({ role = "TEACHER" }) => {
     const navigate = useNavigate();
 
     const [form, setForm] = useState({
@@ -98,8 +102,13 @@ const CreateAnnouncement = () => {
 
         try {
             setLoading(true);
-            await createTeacherNotification(request, attachments);
-            navigate("/teacher/announcements");
+            if (role === "ADMIN") {
+    await createAdminNotification(request, attachments);
+    navigate("/admin/announcements");
+} else {
+    await createTeacherNotification(request, attachments);
+    navigate("/teacher/announcements");
+}
         } catch (err) {
             setError(
                 err.response?.data?.message ||

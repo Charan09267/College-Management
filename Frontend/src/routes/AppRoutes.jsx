@@ -25,6 +25,10 @@ import TeacherRecordings from "../pages/teacher/TeacherRecordings";
 import Login from "../pages/auth/Login";
 import StudentDashboard from "../pages/student/StudentDashboard";
 
+import AdminCreateAnnouncement from "../pages/admin/CreateAnnouncement";
+
+import EditAnnouncement from "../pages/teacher/EditAnnouncement";
+
 const AppRoutes = () => {
     return (
         <BrowserRouter>
@@ -67,6 +71,10 @@ const AppRoutes = () => {
             element={<TeacherRecordings />}
         />
         <Route
+    path="/teacher/announcements/:notificationId/edit"
+    element={<EditAnnouncement />}
+/>
+        <Route
     path="/teacher/announcements/:notificationId"
     element={<AnnouncementDetails />}
 />
@@ -88,6 +96,10 @@ const AppRoutes = () => {
                             path="/admin/dashboard"
                             element={<AdminDashboard />}
                         />
+                        <Route
+    path="/admin/announcements/create"
+    element={<AdminCreateAnnouncement />}
+/>
                     </Route>
                 </Route>
 

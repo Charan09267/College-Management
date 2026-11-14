@@ -30,10 +30,15 @@ const navigation = {
         { name: "Profile", path: "profile", icon: UserCircle },
     ],
     ADMIN: [
-        { name: "Dashboard", path: "dashboard", icon: LayoutDashboard },
-        { name: "Users", path: "users", icon: UserCircle },
-        { name: "Announcements", path: "announcements", icon: Megaphone },
-    ],
+    { name: "Dashboard", path: "dashboard", icon: LayoutDashboard },
+    { name: "Users", path: "users", icon: UserCircle },
+    { name: "Announcements", path: "announcements", icon: Megaphone },
+    {
+        name: "Create Announcement",
+        path: "announcements/create",
+        icon: Megaphone,
+    },
+],
 };
 
 const DashboardLayout = () => {
